@@ -1,1 +1,0 @@
-g++ main.cpp spirit.o -lboost_unit_test_framework

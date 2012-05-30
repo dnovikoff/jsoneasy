@@ -1,0 +1,19 @@
+import testing ;
+using gcc ;
+
+project
+    : requirements <toolset>gcc
+    : requirements <cflags>"-ftemplate-depth-300 -Werror -Wall -Wextra -Wno-long-long -Wno-non-virtual-dtor"
+    : requirements <variant>release
+    : requirements <optimization>speed
+    : requirements <inlining>full
+    : build-dir .build
+;
+
+lib ut : : <name>boost_unit_test_framework : <link>static ;
+
+lib spirit2json : spirit.cpp : <link>static ;
+
+unit-test tst : test.cpp spirit2json ut 
+#: <testing.launcher>valgrind 
+;

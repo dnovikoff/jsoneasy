@@ -1,1 +1,0 @@
-g++ spirit.cpp -c -o spirit.o
