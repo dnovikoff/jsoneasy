@@ -104,14 +104,14 @@ BOOST_AUTO_TEST_CASE ( json_checker ) { // http://json.org/JSON_checker/
 	//fail27.json
 	BOOST_CHECK(! parse("[\"line\\nbreak\"]") );
 
+	//fail28.json
+	BOOST_CHECK(! parse("[\"line\\\\nbreak\"]") );
+
 	//fail33.json
 	BOOST_CHECK(! parse("[\"mismatch\"}") );
 
 	//fail17.json
 	BOOST_CHECK(! parse("[\"Illegal backslash escape: \\017\"]") );
-
-	//fail28.json
-	BOOST_CHECK(! parse("[\"line\\\\nbreak\"]") );
 
 	//fail6.json
 	BOOST_CHECK(! parse("[   , \"<-- missing value\"]") );
