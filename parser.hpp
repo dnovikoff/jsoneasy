@@ -1,3 +1,6 @@
+#ifndef _SPIRIT2JSON_PARSER_HPP_
+#define _SPIRIT2JSON_PARSER_HPP_
+
 #include <boost/typeof/typeof.hpp>
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
@@ -9,7 +12,7 @@
 #include <vector>
 #include <map>
 
-#include "spirit.hpp"
+#include "types.hpp"
 
 namespace client {
 	namespace qi = boost::spirit::qi;
@@ -54,8 +57,8 @@ namespace client {
 	} qchar;
 
 	template <typename Iterator>
-	class value_g : public qi::grammar<Iterator, value_type()> {
-		typedef value_g<Iterator> self_t;
+	class value_grammar : public qi::grammar<Iterator, value_type()> {
+		typedef value_grammar<Iterator> self_t;
 		size_t depth;
 		static const size_t MAX_DEPTH = 20;
 		bool incDepth() {
@@ -81,7 +84,7 @@ namespace client {
 		qi::rule<Iterator, value_type()> start;
 	public:
 
-		value_g() : value_g::base_type(start), depth(0) {
+		value_grammar() : value_grammar::base_type(start), depth(0) {
 			using qi::lit;
 			using qi::_val;
 			using qi::_1;
@@ -118,70 +121,6 @@ namespace client {
 			start = skipper >> ((qstring | double_ | boolean | null | array| map) [ _val = _1 ]) >> skipper;
 		}
 	};
-}
+} // namespace client
 
-namespace std {
-ostream& operator << (ostream& o, const client::null_type&) {
-	o << "<null>";
-	return o;
-}
-
-template<typename T>
-ostream& operator << (ostream& o, const std::vector<T>& v) {
-	size_t c = 0;
-	o << "[";
-	for(BOOST_AUTO(i, v.begin()); i != v.end(); ++i) {
-		if( c++ ) {
-			o << ", ";
-		}
-		o << *i;
-	}
-	o << "]";
-	return o;
-}
-
-template<typename T>
-ostream& operator << (ostream& o, const boost::recursive_wrapper<T>& v) {
-	o << v.get();
-	return o;
-}
-
-
-template<typename T>
-ostream& operator << (ostream& o, const std::map<std::string, T>& v) {
-	size_t c = 0;
-	o << "{";
-	for(BOOST_AUTO(i, v.begin()); i != v.end(); ++i) {
-		if( c++ ) {
-			o << ", ";
-		}
-		o << i->first << " = " << i->second;
-	}
-	o << "}";
-	return o;
-}
-
-} // namespace std
-
-bool parse(const std::string& input, client::value_type& output ) {
-	namespace qi = boost::spirit::qi;
-	std:: cout << "Parsing: " << input << std::endl;
-	typedef std::string::const_iterator iterator_type;
-	typedef client::value_g<iterator_type> value_g;
-
-	iterator_type iter = input.begin();
-	iterator_type end = input.end();
-	value_g value_grammar;
-	bool r = qi::parse(iter, end, value_grammar, output);
-	std:: cout << "Parse result: " << (r?"OK":"ERROR") << std::endl;
-	std:: cout << "Parsed to the end: " << ((iter == end)?"YES":"NO") << std::endl;
-	if(iter != end) {
-		std::cout << "Parse error near: " << std::string(iter, end) << std::endl;
-	}
-	return r && (iter == end);
-}
-
-bool parse(const std::string& input) {
-	client::value_type output;
-	return parse( input, output);
-}
+#endif // SPIRIT2JSON_PARSER_HPP_

@@ -1,7 +1,67 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
+
 #include <boost/test/unit_test.hpp>
-#include "spirit.hpp"
+#include <boost/typeof/typeof.hpp>
+
+#include "string_parser.hpp"
+
+namespace std {
+ostream& operator << (ostream& o, const client::null_type&) {
+	o << "<null>";
+	return o;
+}
+
+template<typename T>
+ostream& operator << (ostream& o, const std::vector<T>& v) {
+	size_t c = 0;
+	o << "[";
+	for(BOOST_AUTO(i, v.begin()); i != v.end(); ++i) {
+		if( c++ ) {
+			o << ", ";
+		}
+		o << *i;
+	}
+	o << "]";
+	return o;
+}
+
+template<typename T>
+ostream& operator << (ostream& o, const boost::recursive_wrapper<T>& v) {
+	o << v.get();
+	return o;
+}
+
+
+template<typename T>
+ostream& operator << (ostream& o, const std::map<std::string, T>& v) {
+	size_t c = 0;
+	o << "{";
+	for(BOOST_AUTO(i, v.begin()); i != v.end(); ++i) {
+		if( c++ ) {
+			o << ", ";
+		}
+		o << i->first << " = " << i->second;
+	}
+	o << "}";
+	return o;
+}
+
+} // namespace std
+
+namespace {
+
+bool parse(const std::string& input, client::value_type& output ) {
+	string_parser p;
+	return p( input, output );
+}
+
+bool parse(const std::string& input ) {
+	string_parser p;
+	return p( input );
+}
+
+} // namespace
 
 BOOST_AUTO_TEST_CASE ( simple ) {
   BOOST_CHECK( parse("null") );
