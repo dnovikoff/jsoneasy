@@ -78,8 +78,8 @@ namespace client {
 			skipper = *space;
 
 			qstring = char_('\"') [ _val = "" ] >>
-					*((lit('\\') >> (
-					qchar [ _val += _1]
+					*((char_('\\') >> (
+					qchar [ _val += _1 ]
 					| ( char_('u') >> hex(2) [ _val += _1 ] >> hex(2) [ _val += _1 ])
 					)) | (char_ - '\"' - '\\' - '\t' - '\n' - '\r')[ _val += _1 ])
 					>> '\"'
