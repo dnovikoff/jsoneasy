@@ -34,6 +34,26 @@ namespace client {
 	} qchar;
 
 	template <typename Iterator>
+	class qstring_grammar : public qi::grammar<Iterator, std::string()> {
+		qi::rule<Iterator, std::string()> start;
+	public:
+		qstring_grammar() : qstring_grammar::base_type(start) {
+			using qi::hex;
+			using qi::_val;
+			using qi::char_;
+			using qi::_1;
+
+			start = char_('\"') [ _val = "" ] >>
+					*((char_('\\') >> (
+					qchar [ _val += _1 ]
+					| ( char_('u') >> hex(2) [ _val += _1 ] >> hex(2) [ _val += _1 ])
+					)) | (char_ - '\"' - '\\' - '\t' - '\n' - '\r')[ _val += _1 ])
+					>> '\"'
+					;
+		}
+	};
+
+	template <typename Iterator>
 	class value_grammar : public qi::grammar<Iterator, value_type()> {
 		typedef value_grammar<Iterator> self_t;
 		size_t depth;
@@ -50,7 +70,7 @@ namespace client {
 
 		qi::rule<Iterator> skipper;
 
-		qi::rule<Iterator, std::string()> qstring;
+		qstring_grammar<Iterator> qstring;
 
 		qi::rule<Iterator, vector_t() > array;
 
@@ -73,7 +93,6 @@ namespace client {
 			using qi::char_;
 			using qi::_pass;
 			using qi::double_;
-			using qi::hex;
 			using qi::bool_;
 			using boost::phoenix::push_back;
 			using boost::phoenix::insert;
@@ -81,14 +100,6 @@ namespace client {
 			using ascii::space;
 
 			skipper = *space;
-
-			qstring = char_('\"') [ _val = "" ] >>
-					*((char_('\\') >> (
-					qchar [ _val += _1 ]
-					| ( char_('u') >> hex(2) [ _val += _1 ] >> hex(2) [ _val += _1 ])
-					)) | (char_ - '\"' - '\\' - '\t' - '\n' - '\r')[ _val += _1 ])
-					>> '\"'
-					;
 
 			null = lit("null") [ _val = null_type() ];
 			BOOST_AUTO(inc, bind(&self_t::incDepth, this));
