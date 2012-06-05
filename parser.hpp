@@ -44,6 +44,9 @@ namespace client {
 		void decDepth() {
 			--depth;
 		}
+		void reset() {
+			depth = 0;
+		}
 
 		qi::rule<Iterator> skipper;
 
@@ -55,6 +58,8 @@ namespace client {
 		qi::rule<Iterator, map_t() > map;
 
 		qi::rule<Iterator, null_type()> null;
+
+		qi::rule<Iterator, value_type()> value;
 
 		qi::rule<Iterator, value_type()> start;
 	public:
@@ -88,12 +93,13 @@ namespace client {
 			null = lit("null") [ _val = null_type() ];
 			BOOST_AUTO(inc, bind(&self_t::incDepth, this));
 			BOOST_AUTO(dec, bind(&self_t::decDepth, this));
-			array = char_('[') [ _val = vector_t() ] >> eps[ _pass = inc ] >> ((start [ push_back( _val, _1 ) ] % ',') | skipper) >> char_(']') [ dec ];
+			array = char_('[') [ _val = vector_t() ] >> eps[ _pass = inc ] >> ((value [ push_back( _val, _1 ) ] % ',') | skipper) >> char_(']') [ dec ];
 
-			pair = skipper >> qstring [ bind( &pair_t::first, _val) = _1 ] >> skipper >> ':' >> start [ bind( &pair_t::second, _val) = _1 ];
+			pair = skipper >> qstring [ bind( &pair_t::first, _val) = _1 ] >> skipper >> ':' >> value [ bind( &pair_t::second, _val) = _1 ];
 			map = char_('{') [ _val = map_t() ] >> ((pair [ insert( _val, _1 ) ] % ',') | skipper) >> '}';
 
-			start = skipper >> ((qstring | double_ | bool_ | null | array| map) [ _val = _1 ]) >> skipper;
+			value = skipper >> ((qstring | double_ | bool_ | null | array| map) [ _val = _1 ]) >> skipper;
+			start = eps[ bind(&self_t::reset, this) ] >> skipper >> (array | map) >> skipper;
 		}
 	};
 } // namespace client
