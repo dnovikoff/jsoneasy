@@ -1,5 +1,6 @@
+#include <core/parser.hpp>
+
 #include "string_parser.hpp"
-#include "parser.hpp"
 
 string_parser::string_parser() {
 	grammar.reset(new value_g);

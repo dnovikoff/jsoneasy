@@ -4,7 +4,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/typeof/typeof.hpp>
 
-#include "string_parser.hpp"
+#include <parser/string_parser.hpp>
 
 BOOST_AUTO_TEST_CASE ( json_checker ) { // http://json.org/JSON_checker/
 	string_parser parse;

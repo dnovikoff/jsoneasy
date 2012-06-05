@@ -5,7 +5,7 @@
 
 #include <boost/scoped_ptr.hpp>
 
-#include "types.hpp"
+#include <core/types.hpp>
 
 struct string_parser {
 	string_parser();

@@ -7,15 +7,12 @@ project
     : requirements <variant>release
     : requirements <optimization>speed
     : requirements <inlining>full
+    : requirements <include>.
     : build-dir .build
 ;
 
-lib ut : : <name>boost_unit_test_framework : <link>static ;
+build-project parser ;
 
-lib string_parser : string_parser.cpp : <link>static ;
+alias string_parser : parser//string_parser ;
 
-unit-test test : test.cpp string_parser ut ;
-unit-test test2 : test2.cpp string_parser ut ;
-unit-test test3 : test3.cpp string_parser ut ;
-
-#: <testing.launcher>gdb 
+build-project test ;

@@ -10,7 +10,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/typeof/typeof.hpp>
 
-#include "string_parser.hpp"
+#include <parser/string_parser.hpp>
 
 #define INCLUDE_FILE(NAME,DIR,EXT) \
 asm( \
@@ -23,7 +23,7 @@ asm( \
   ); \
 extern char NAME##_begin;\
 
-#define INCLUDE_TEST(NAME) INCLUDE_FILE(NAME, "json_checker_test/data/",".json")
+#define INCLUDE_TEST(NAME) INCLUDE_FILE(NAME, "test/data/",".json")
 
 #define SHOW(NAME) INCLUDE_TEST(NAME); std::cout << &NAME##_begin << std::endl;
 #define POSITIVE(NAME) INCLUDE_TEST(NAME); BOOST_CHECK( parse( &NAME##_begin ) );
