@@ -18,29 +18,6 @@ namespace client {
 	namespace qi = boost::spirit::qi;
 	namespace ascii = boost::spirit::ascii;
 
-	struct hex_ : qi::symbols<char, char> {
-		hex_() {
-			add
-				("0"    , 0)
-				("1"    , 1)
-				("2"    , 2)
-				("3"    , 3)
-				("4"    , 4)
-				("5"    , 5)
-				("6"    , 6)
-				("7"    , 7)
-				("8"    , 8)
-				("9"    , 9)
-				("A"    , 10)
-				("B"    , 11)
-				("C"    , 12)
-				("D"    , 13)
-				("E"    , 14)
-				("F"    , 15)
-			;
-		}
-	} hex;
-
 	struct qchar_ : qi::symbols<char, char> {
 		qchar_() {
 			add
@@ -70,7 +47,6 @@ namespace client {
 
 		qi::rule<Iterator> skipper;
 
-		qi::rule<Iterator, char()> hexchar;
 		qi::rule<Iterator, std::string()> qstring;
 
 		qi::rule<Iterator, vector_t() > array;
@@ -78,7 +54,6 @@ namespace client {
 		qi::rule<Iterator, pair_t() > pair;
 		qi::rule<Iterator, map_t() > map;
 
-		qi::rule<Iterator, bool()> boolean;
 		qi::rule<Iterator, null_type()> null;
 
 		qi::rule<Iterator, value_type()> start;
@@ -93,6 +68,8 @@ namespace client {
 			using qi::char_;
 			using qi::_pass;
 			using qi::double_;
+			using qi::hex;
+			using qi::bool_;
 			using boost::phoenix::push_back;
 			using boost::phoenix::insert;
 			using boost::phoenix::bind;
@@ -100,16 +77,14 @@ namespace client {
 
 			skipper = *space;
 
-			hexchar = hex [ _val = _1*16 ] >> hex [ _val += _1 ];
 			qstring = char_('\"') [ _val = "" ] >>
 					*((lit('\\') >> (
 					qchar [ _val += _1]
-					| ( char_('u') >> hexchar [ _val += _1 ] >> hexchar [ _val += _1 ])
+					| ( char_('u') >> hex(2) [ _val += _1 ] >> hex(2) [ _val += _1 ])
 					)) | (char_ - '\"' - '\\' - '\t' - '\n' - '\r')[ _val += _1 ])
 					>> '\"'
 					;
 
-			boolean = ( lit("true")[ _val = true ] ) | ( lit("false") [ _val = false ] );
 			null = lit("null") [ _val = null_type() ];
 			BOOST_AUTO(inc, bind(&self_t::incDepth, this));
 			BOOST_AUTO(dec, bind(&self_t::decDepth, this));
@@ -118,7 +93,7 @@ namespace client {
 			pair = skipper >> qstring [ bind( &pair_t::first, _val) = _1 ] >> skipper >> ':' >> start [ bind( &pair_t::second, _val) = _1 ];
 			map = char_('{') [ _val = map_t() ] >> ((pair [ insert( _val, _1 ) ] % ',') | skipper) >> '}';
 
-			start = skipper >> ((qstring | double_ | boolean | null | array| map) [ _val = _1 ]) >> skipper;
+			start = skipper >> ((qstring | double_ | bool_ | null | array| map) [ _val = _1 ]) >> skipper;
 		}
 	};
 } // namespace client
