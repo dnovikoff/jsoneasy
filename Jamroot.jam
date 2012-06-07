@@ -16,3 +16,9 @@ build-project parser ;
 alias string_parser : parser//string_parser ;
 
 build-project test ;
+
+alias test1 : test//test1 ;
+alias test2 : test//test2 ;
+alias test3 : test//test3 ;
+
+

@@ -77,3 +77,12 @@ BOOST_AUTO_TEST_CASE ( simple_map ) {
 }
 
 
+BOOST_AUTO_TEST_CASE ( simple_hex ) {
+	BOOST_CHECK( parse("[\"\\uCAFE\"]") ); // Upper case
+	BOOST_CHECK( !parse("[\"\\uCAF\"]") );
+	BOOST_CHECK( !parse("[\"\\UCAFE\"]") );
+	BOOST_CHECK( parse("[\"\\ubcda\"]") ); // Lower case
+	BOOST_CHECK( parse("[\"\\uef4A\"]") ); // Combined case
+
+	BOOST_CHECK( parse("{\"\\uCAFE\\uBABE\\uAB98\\uFCDE\\ubcda\\uef4A\":\"A key can be any string\"}") );
+}

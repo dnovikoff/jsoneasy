@@ -36,6 +36,7 @@ namespace client {
 	template <typename Iterator>
 	class qstring_grammar : public qi::grammar<Iterator, std::string()> {
 		qi::rule<Iterator, std::string()> start;
+		boost::spirit::qi::uint_parser<unsigned, 16, 4, 4> myhex;
 	public:
 		qstring_grammar() : qstring_grammar::base_type(start) {
 			using qi::hex;
@@ -44,10 +45,13 @@ namespace client {
 			using qi::_1;
 
 			start = char_('\"') [ _val = "" ] >>
-					*((char_('\\') >> (
-					qchar [ _val += _1 ]
-					| ( char_('u') >> hex(2) [ _val += _1 ] >> hex(2) [ _val += _1 ])
-					)) | (char_ - '\"' - '\\' - '\t' - '\n' - '\r')[ _val += _1 ])
+					*(
+						(char_('\\') >>
+							( ( char_('u') >> myhex [ _val += _1 ] )
+							|
+							qchar [ _val += _1 ]
+						)
+					) | (char_ - '\"' - '\\' - '\t' - '\n' - '\r')[ _val += _1 ] )
 					>> '\"'
 					;
 		}
