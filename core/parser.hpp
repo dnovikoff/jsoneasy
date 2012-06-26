@@ -86,6 +86,8 @@ namespace client {
 		qi::rule<Iterator, value_type()> value;
 
 		qi::rule<Iterator, value_type()> start;
+
+		qi::real_parser<double, qi::strict_real_policies<double> > strict_double;
 	public:
 
 		value_grammar() : value_grammar::base_type(start), depth(0) {
@@ -113,7 +115,7 @@ namespace client {
 			pair = skipper >> qstring [ bind( &pair_t::first, _val) = _1 ] >> skipper >> ':' >> value [ bind( &pair_t::second, _val) = _1 ];
 			map = char_('{') [ _val = map_t() ] >> ((pair [ insert( _val, _1 ) ] % ',') | skipper) >> '}';
 
-			value = skipper >> ((qstring | double_ | bool_ | null | array| map) [ _val = _1 ]) >> skipper;
+			value = skipper >> ((qstring | strict_double | int_ | bool_ | null | array| map) [ _val = _1 ]) >> skipper;
 			start = eps[ bind(&self_t::reset, this) ] >> skipper >> (array | map) >> skipper;
 		}
 	};

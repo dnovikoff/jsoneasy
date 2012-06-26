@@ -14,7 +14,7 @@ namespace client {
 	typedef std::map<std::string, rwrapper> rmap_t;
 
 	typedef boost::make_recursive_variant<
-//		int,
+		int,
 		double,
 		bool,
 		null_type,
