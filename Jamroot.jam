@@ -3,7 +3,7 @@ using gcc ;
 
 project
     : requirements <toolset>gcc
-    : requirements <cflags>"-ftemplate-depth-300 -Werror -Wall -Wextra -Wno-long-long -Wno-non-virtual-dtor"
+    : requirements <cflags>"-ftemplate-depth-300 -Werror -Wall -Wextra -Wno-long-long -Wno-non-virtual-dtor -std=c++11"
     : requirements <variant>release
     : requirements <optimization>speed
     : requirements <inlining>full
@@ -17,8 +17,8 @@ alias string_parser : parser//string_parser ;
 
 build-project test ;
 
-alias test1 : test//test1 ;
-alias test2 : test//test2 ;
-alias test3 : test//test3 ;
+#alias test1 : test//test1 ;
+#alias test2 : test//test2 ;
+#alias test4 : test//test4 ;
 
 

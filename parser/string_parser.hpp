@@ -2,21 +2,22 @@
 #define _SPIRIT2JSON_STRING_PARSER_HPP_
 
 #include <string>
+#include <memory>
+#include <core/parser.hpp>
+class UserParser;
 
-#include <boost/scoped_ptr.hpp>
-
-#include <core/types.hpp>
-
-struct string_parser {
-	string_parser();
-	~string_parser();
-	bool operator()(const std::string& input, client::value_type& output );
-	bool operator()(const std::string& input);
-private:
+class StringParser {
 	typedef std::string::const_iterator iterator_type;
 	typedef client::value_grammar<iterator_type> value_g;
+	std::unique_ptr<value_g> grammar;
+public:
+	StringParser();
+	~StringParser();
+	bool operator()(const std::string& input, UserParser::Ptr& parser );
+private:
 
-	boost::scoped_ptr<value_g> grammar;
+
+
 };
 
 #endif // _SPIRIT2JSON_STRING_PARSER_HPP_

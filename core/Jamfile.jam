@@ -1,0 +1,1 @@
+lib core : user_parser.cpp : <link>static ;

@@ -6,9 +6,167 @@
 
 #include <parser/string_parser.hpp>
 
-BOOST_AUTO_TEST_CASE ( json_checker ) { // http://json.org/JSON_checker/
-	string_parser parse;
-	BOOST_CHECK( /* fail1.json */ ! parse("\"A JSON payload should be an object or array, not a string.\"") );
+/**
+ * Parse all
+ */
+class MyParser: public UserParser {
+	const size_t depth;
+	static const size_t MAX_DEPTH = 20;
+	std::ostringstream tmpstream;
+public:
+	std::ostream& shift() {
+		tmpstream << std::string(depth,' ');
+		return tmpstream;
+	}
+	explicit MyParser(const size_t d = 0):depth(d) {
+		if( depth >= MAX_DEPTH ) {
+			throw std::runtime_error("Too deep");
+		}
+	}
+	bool operator()(int x) override {
+		shift() << "int=" << x << std::endl;
+		return true;
+	}
+	bool operator()(bool x) override {
+		shift() << "bool=" << x << std::endl;
+		return true;
+	}
+	bool operator()(double x) override {
+		shift() << "double=" << x << std::endl;
+		return true;
+	}
+	bool operator()(std::string& x) override {
+		shift() << "string=" << x << std::endl;
+		return true;
+	}
+	bool null() override {
+		shift() << "null" << std::endl;
+		return true;
+	}
+	bool key(std::string& x) override {
+		shift() << "key=" << x << std::endl;
+		return true;
+	}
+
+	Ptr object() override {
+		shift() << "object{" << std::endl;
+		return Ptr(new MyParser(depth+1));
+	}
+	Ptr array() override {
+		shift() << "array[" << std::endl;
+		return Ptr(new MyParser(depth+1));
+	}
+
+	bool onParsed() override {
+		shift() << "}/]" << std::endl;
+		return true;
+	}
+};
+
+
+class MyStringParser: public StringParser {
+public:
+	MyStringParser() {}
+	bool operator()(const std::string& input) {
+		UserParser::Ptr mp(new MyParser);
+		try {
+			return StringParser::operator ()(input, mp);
+		} catch(const std::runtime_error&) {}
+		return false;
+	}
+};
+
+namespace {
+
+bool parse(const std::string& input ) {
+	MyStringParser p;
+	return p( input );
+}
+
+} // namespace
+
+BOOST_AUTO_TEST_CASE ( whiteSpace ) {
+	BOOST_CHECK( parse("[]") );
+	BOOST_CHECK( parse(" []") );
+	BOOST_CHECK( parse("[] ") );
+	BOOST_CHECK( parse("[ ]") );
+	BOOST_CHECK( parse(" [ ] ") );
+	BOOST_CHECK( parse("       [    \n  \n\n]   \t\t  \t ") );
+}
+
+BOOST_AUTO_TEST_CASE ( simple ) {
+	BOOST_CHECK( parse("[null]") );
+	BOOST_CHECK( parse("[false]") );
+	BOOST_CHECK( parse("[true]") );
+
+	BOOST_CHECK( parse("[1]") );
+	BOOST_CHECK( parse("[-1]") );
+	BOOST_CHECK( parse("[1.121]") );
+
+	BOOST_CHECK( parse("[\"hello\"]") );
+
+	BOOST_CHECK( parse("[]") );
+	BOOST_CHECK( parse("{}") );
+}
+
+BOOST_AUTO_TEST_CASE ( simple_negative ) {
+	BOOST_CHECK( !parse("[null1]") );
+	BOOST_CHECK( !parse("[2false]") );
+	BOOST_CHECK( !parse("[true3]") );
+
+	BOOST_CHECK( !parse("[a1]") );
+	BOOST_CHECK( !parse("[-f1]") );
+	BOOST_CHECK( !parse("1,1") );
+
+	BOOST_CHECK( !parse("[\"hello]") );
+
+	BOOST_CHECK( !parse("[") );
+	BOOST_CHECK( !parse("}") );
+}
+
+BOOST_AUTO_TEST_CASE ( simple_spaces ) {
+	BOOST_CHECK( parse("[null]") );
+	BOOST_CHECK( parse("[ null]") );
+	BOOST_CHECK( parse("[  null]") );
+	BOOST_CHECK( parse("[null ]") );
+	BOOST_CHECK( parse("[null  ]") );
+	BOOST_CHECK( parse("[ null ]") );
+	BOOST_CHECK( parse("[  null  ]") );
+}
+
+BOOST_AUTO_TEST_CASE ( simple_string ) {
+	BOOST_CHECK( parse("[\"\"]") );
+	BOOST_CHECK( parse("[\"\\\"\"]") );
+	BOOST_CHECK( parse("[\"\\\\\"]") );
+	BOOST_CHECK( parse("[\"\\\\\\\"\"]") );
+	BOOST_CHECK( parse("[\"hello world\"]") );
+}
+
+BOOST_AUTO_TEST_CASE ( simple_array ) {
+	BOOST_CHECK( parse("[]") );
+	BOOST_CHECK( parse("[1]") );
+	BOOST_CHECK( parse("[1,2]") );
+	BOOST_CHECK( parse("[1,2,true, null, false,[]]") );
+}
+
+BOOST_AUTO_TEST_CASE ( simple_map ) {
+	BOOST_CHECK( parse("{}") );
+	BOOST_CHECK( parse("{\"hello\": 1}") );
+	BOOST_CHECK( parse("{\"hello\": 1, \"world\": [{}]}") );
+}
+
+BOOST_AUTO_TEST_CASE ( simple_hex ) {
+	BOOST_CHECK( parse("[\"\\uCAFE\"]") ); // Upper case
+	BOOST_CHECK( !parse("[\"\\uCAF\"]") );
+	BOOST_CHECK( !parse("[\"\\UCAFE\"]") );
+	BOOST_CHECK( parse("[\"\\ubcda\"]") ); // Lower case
+	BOOST_CHECK( parse("[\"\\uef4A\"]") ); // Combined case
+
+	BOOST_CHECK( parse("{\"\\uCAFE\\uBABE\\uAB98\\uFCDE\\ubcda\\uef4A\":\"A key can be any string\"}") );
+}
+
+BOOST_AUTO_TEST_CASE ( jsonChecker ) {
+	BOOST_CHECK( ! parse("\"A JSON payload should be an object or array, not a string.\"") );
 	BOOST_CHECK( /* fail10.json */ ! parse("{\"Extra value after close\": true} \"misplaced quoted value\"") );
 	BOOST_CHECK( /* fail11.json */ ! parse("{\"Illegal expression\": 1 + 2}") );
 	BOOST_CHECK( /* fail12.json */ ! parse("{\"Illegal invocation\": alert()}") );
