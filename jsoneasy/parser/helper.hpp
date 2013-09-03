@@ -1,15 +1,22 @@
-#ifndef PARSER_HELPER_HPP_
-#define PARSER_HELPER_HPP_
-
-#include <type_traits>
+#ifndef JSONEASY_PARSER_HELPER_HPP_
+#define JSONEASY_PARSER_HELPER_HPP_
 
 #include <string>
-#include <parser/string_parser.hpp>
+
+#include <set>
+#include <list>
+#include <map>
+#include <stack>
+
+#include <jsoneasy/parser/handler.hpp>
+
+namespace JsonEasy {
+namespace Parser   {
 
 struct NullTag {};
 
 template<typename T>
-class TemplateParser;
+class TemplateHandler;
 
 template<typename ParsedType, typename UserType>
 struct ConvertType {
@@ -127,11 +134,11 @@ public:
 static const NullTag nullTag;
 
 template<typename T>
-class TemplateParser: public UserParser {
+class TemplateHandler: public Handler {
 	T& data;
 	NextValue<T> nv;
 public:
-	explicit TemplateParser(T& d):data(d), nv(d) {}
+	explicit TemplateHandler(T& d):data(d), nv(d) {}
 	bool operator()(int x) override {
 		return nv.insert(x);
 	}
@@ -159,18 +166,18 @@ public:
 };
 
 template<typename T>
-class StartParser: public BaseParser {
+class StartParser: public BaseHandler {
 	T& data;
 public:
 	explicit StartParser(T& d):data(d) {}
 	Ptr object() override {
 		if( NextValue<T>::type != ObjectType ) return Ptr();
-		Ptr p(new TemplateParser<T>(data));
+		Ptr p(new TemplateHandler<T>(data));
 		return p;
 	}
 	Ptr array()  override {
 		if( NextValue<T>::type != ArrayType ) return Ptr();
-		Ptr p(new TemplateParser<T>(data));
+		Ptr p(new TemplateHandler<T>(data));
 		return p;
 	}
 };
@@ -179,10 +186,12 @@ template<typename T>
 void parseTo(const std::string& data, T& container) {
 	StringParser sp;
 	T tmp;
-	UserParser::Ptr p(new StartParser<T>(tmp));
+	Handler::Ptr p(new StartParser<T>(tmp));
 	sp(data, p);
 	boost::swap(tmp, container);
 }
 
+} // namespace Parser
+} // namespace JsonEasy
 
-#endif /* PARSER_HELPER_CPP_ */
+#endif /* JSONEASY_PARSER_HELPER_HPP_ */

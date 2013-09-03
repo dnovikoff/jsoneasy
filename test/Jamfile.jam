@@ -1,12 +1,8 @@
 lib ut : : <name>boost_unit_test_framework : <link>static ;
 
-alias string_parser : ..//string_parser/<link>static ;
-alias core : ..//core/<link>static ;
+alias parser : ..//jsoneasy/parser/<link>static ;
 
-#unit-test test1 : test1.cpp string_parser ut ;
-#unit-test test2 : test2.cpp string_parser ut ;
-#unit-test test3 : test3.cpp string_parser ut ;
-unit-test values_test : values.cpp string_parser core ut ;
-unit-test parse_test : parse.cpp string_parser core ut ;
+unit-test values_test : values.cpp parser ut ;
+unit-test parse_test : parse.cpp parser ut ;
 
 #: <testing.launcher>gdb

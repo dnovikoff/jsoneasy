@@ -1,1 +1,0 @@
-lib string_parser : string_parser.cpp : <link>static ;

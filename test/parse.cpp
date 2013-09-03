@@ -4,12 +4,14 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/typeof/typeof.hpp>
 
-#include <parser/string_parser.hpp>
+#include <jsoneasy/parser/string_parser.hpp>
+#include <jsoneasy/parser/exception.hpp>
+#include <jsoneasy/parser/handler.hpp>
 
 /**
  * Parse all
  */
-class MyParser: public UserParser {
+class MyParser: public JsonEasy::Parser::Handler {
 	const size_t depth;
 	static const size_t MAX_DEPTH = 20;
 	std::ostringstream tmpstream;
@@ -18,11 +20,8 @@ public:
 		tmpstream << std::string(depth,' ');
 		return tmpstream;
 	}
-	explicit MyParser(const size_t d = 0):depth(d) {
-		if( depth >= MAX_DEPTH ) {
-			throw std::runtime_error("Too deep");
-		}
-	}
+	explicit MyParser(const size_t d = 0):depth(d) {}
+
 	bool operator()(int x) override {
 		shift() << "int=" << x << std::endl;
 		return true;
@@ -48,11 +47,17 @@ public:
 		return true;
 	}
 
+	bool isTooDeepForNext() const{
+		return ( depth+1 >= MAX_DEPTH );
+	}
+
 	Ptr object() override {
+		if(isTooDeepForNext()) return Ptr();
 		shift() << "object{" << std::endl;
 		return Ptr(new MyParser(depth+1));
 	}
 	Ptr array() override {
+		if(isTooDeepForNext()) return Ptr();
 		shift() << "array[" << std::endl;
 		return Ptr(new MyParser(depth+1));
 	}
@@ -64,14 +69,13 @@ public:
 };
 
 
-class MyStringParser: public StringParser {
+class MyStringParser: public JsonEasy::Parser::StringParser {
 public:
-	MyStringParser() {}
 	bool operator()(const std::string& input) {
-		UserParser::Ptr mp(new MyParser);
+		JsonEasy::Parser::Handler::Ptr mp(new MyParser);
 		try {
-			return StringParser::operator ()(input, mp);
-		} catch(const std::runtime_error&) {}
+			return parse(input, mp);
+		} catch(const JsonEasy::Parser::UnexpectedException&) {}
 		return false;
 	}
 };

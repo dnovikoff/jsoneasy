@@ -1,20 +1,23 @@
-#ifndef USER_PARASER_HPP_
-#define USER_PARASER_HPP_
+#ifndef JSONEASY_PARSER_HANDLER_HPP_
+#define JSONEASY_PARSER_HANDLER_HPP_
 
 #include <memory>
+#include <string>
 
+namespace JsonEasy {
+namespace Parser   {
 /**
  * Interface for your parser
  */
-class UserParser {
+class Handler {
 	// noncopy
-	UserParser(const UserParser&);
-	UserParser& opeartor(const UserParser&);
+	Handler(const Handler&);
+	Handler& opeartor(const Handler&);
 public:
-	virtual ~UserParser() = 0;
-	typedef std::unique_ptr<UserParser> Ptr;
+	virtual ~Handler() = 0;
+	typedef std::unique_ptr<Handler> Ptr;
 
-	UserParser() {}
+	Handler() {}
 
 	/**
 	 * Parsing different types
@@ -48,9 +51,9 @@ public:
  * Base parser to be inherited from
  * All operations fails by default
  */
-class BaseParser: public UserParser {
+class BaseHandler: public Handler {
 public:
-	virtual ~BaseParser() = 0;
+	virtual ~BaseHandler() = 0;
 	bool operator()(int)          override { return false; }
 	bool operator()(bool)         override { return false; }
 	bool operator()(double)       override { return false; }
@@ -67,5 +70,7 @@ public:
 	bool onParsed() override { return true; }
 };
 
+} // namespace Parser
+} // namespace JsonEasy
 
-#endif /* USER_PARASER_HPP_ */
+#endif /* JSONEASY_PARSER_HANDLER_HPP_ */

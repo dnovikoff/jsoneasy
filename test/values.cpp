@@ -1,11 +1,13 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
+#include <iostream>
+
 #include <boost/test/unit_test.hpp>
 #include <boost/typeof/typeof.hpp>
 
-#include <parser/string_parser.hpp>
-#include <parser/parser_helper.hpp>
+#include <jsoneasy/parser/string_parser.hpp>
+#include <jsoneasy/parser/helper.hpp>
 
 #include <vector>
 #include <list>
@@ -48,6 +50,8 @@ static bool cequals(const R1& x1, const R2& x2) {
 	}
 	return true;
 }
+
+using JsonEasy::Parser::parseTo;
 
 BOOST_AUTO_TEST_CASE ( vectorTest ) {
 	std::vector<int> x;
@@ -174,7 +178,7 @@ BOOST_AUTO_TEST_CASE ( startTest ) {
 	parseTo("{}", x1);
 }
 
-BOOST_AUTO_TEST_CASE ( mapWithNotStringKey ) {
-	std::map<int, int> x;
-	parseTo("{}", x);
-}
+//BOOST_AUTO_TEST_CASE ( mapWithNotStringKey ) {
+//	std::map<int, int> x;
+//	parseTo("{}", x);
+//}

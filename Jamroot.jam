@@ -11,9 +11,7 @@ project
     : build-dir .build
 ;
 
-build-project parser ;
-
-alias string_parser : parser//string_parser ;
+build-project jsoneasy ;
 
 build-project test ;
 
