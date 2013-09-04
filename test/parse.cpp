@@ -72,9 +72,9 @@ public:
 class MyStringParser: public JsonEasy::Parser::StringParser {
 public:
 	bool operator()(const std::string& input) {
-		JsonEasy::Parser::Handler::Ptr mp(new MyParser);
+		JsonEasy::Parser::Handler::Ptr h(new MyParser);
 		try {
-			return parse(input, mp);
+			return parse(input, h);
 		} catch(const JsonEasy::Parser::UnexpectedException&) {}
 		return false;
 	}
