@@ -21,7 +21,7 @@ public:
 	template<typename X>
 	bool insert(X& x) {
 		T tmp;
-		if( !convertToUser(x, tmp) ) return false;
+		if( !jsonToUser(x, tmp) ) return false;
 		data.push( std::move(tmp) );
 		return true;
 	}

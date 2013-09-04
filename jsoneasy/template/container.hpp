@@ -2,7 +2,7 @@
 #define JSONEASY_TEMPLATE_INSERT_HPP_
 
 #include <string>
-#include <jsoneasy/template/convert.hpp>
+#include <jsoneasy/template/type.hpp>
 
 namespace JsonEasy {
 namespace Template {
@@ -27,7 +27,7 @@ public:
 	template<typename X>
 	bool insert(X& x) {
 		typename T::value_type tmp;
-		if( !convertToUser(x,tmp) ) return false;
+		if( !jsonToUser(x,tmp) ) return false;
 		data.push_back( std::move(tmp) );
 		return true;
 	}

@@ -28,7 +28,7 @@ public:
 	template<typename X>
 	bool insert(X& x) {
 		V tmp;
-		if( !convertToUser(x, tmp) ) return false;
+		if( !jsonToUser(x, tmp) ) return false;
 		auto p = std::make_pair(std::move(keyS), std::move(tmp));
 		return data.insert(std::move(p)).second;
 	}
@@ -54,7 +54,7 @@ public:
 	template<typename X>
 	bool insert(X& x) {
 		V tmp;
-		if( !convertToUser(x, tmp) ) return false;
+		if( !jsonToUser(x, tmp) ) return false;
 		auto p = std::make_pair(std::move(keyS), std::move(tmp));
 		data.insert(std::move(p)).second;
 		return true;

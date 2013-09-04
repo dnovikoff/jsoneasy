@@ -1,5 +1,5 @@
-#ifndef JSONEASY_TEMPLATE_CONVERT_HPP_
-#define JSONEASY_TEMPLATE_CONVERT_HPP_
+#ifndef JSONEASY_TEMPLATE_TYPE_HPP_
+#define JSONEASY_TEMPLATE_TYPE_HPP_
 
 namespace JsonEasy {
 namespace Template {
@@ -9,8 +9,8 @@ namespace Template {
  * Not allowed to convert by default
  */
 template<typename JsonType, typename UserType>
-struct Convert {
-	static bool toUser(JsonType&, UserType&) { return false; }
+struct Type {
+	static bool jsonToUser(JsonType&, UserType&) { return false; }
 };
 
 /**
@@ -18,8 +18,8 @@ struct Convert {
  * Example: <int,int> , <double, double> , <string,string>
  */
 template<typename T>
-struct Convert<T,T> {
-	static bool toUser(T& json, T& user) {
+struct Type<T,T> {
+	static bool jsonToUser(T& json, T& user) {
 		user = std::move(json);
 		return true;
 	}
@@ -29,11 +29,11 @@ struct Convert<T,T> {
  * Just suggar to ommit template types
  */
 template<typename JsonType, typename UserType>
-static bool convertToUser(JsonType& pt, UserType& ut) {
-	return Convert<JsonType, UserType>::toUser( pt, ut );
+static bool jsonToUser(JsonType& pt, UserType& ut) {
+	return Type<JsonType, UserType>::jsonToUser( pt, ut );
 }
 
 } // namespace Template
 } // namespace JsonEasy
 
-#endif /* JSONEASY_TEMPLATE_CONVERT_HPP_ */
+#endif /* JSONEASY_TEMPLATE_TYPE_HPP_ */
