@@ -12,21 +12,14 @@ namespace JsonEasy {
 namespace Template {
 
 // array is [], object is {}
-enum JsonContainerType { NotContainer, JsonAny, JsonObject, JsonArray };
+enum JsonContainerType { NotContainer, JsonObject, JsonArray };
 
-template<typename T>
+// RequestedType is usefull in case of JsonAny type
+// To determinate type of parsed container
+template<JsonContainerType RequestedType, typename T>
 class Container {
 public:
 	static const JsonContainerType type = NotContainer;
-};
-
-template<typename T>
-struct ContainerType {
-	typedef Container<T> ContainerT;
-	static const JsonContainerType type = ContainerT::type;
-
-	static const bool canBeObject = ( type == JsonObject || type == JsonAny );
-	static const bool canBeArray  = ( type == JsonArray  || type == JsonAny );
 };
 
 } // namespace Template

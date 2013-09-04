@@ -11,31 +11,33 @@ namespace Template {
 
 template<typename T, typename ParentT> class Handler;
 
-template<bool canBeThis, typename ContainerT>
+template<bool enable, JsonContainerType JsonType, typename ContainerT>
 struct SubHandler {
 	static Parser::Handler::Ptr create(ContainerT&) {
 		return Parser::Handler::Ptr();
 	}
 };
 
-template<typename ContainerT>
-struct SubHandler<true, ContainerT> {
+template<JsonContainerType JsonType, typename ContainerT>
+struct SubHandler<true, JsonType, ContainerT> {
 	typedef typename ContainerT::value_type value_type;
 
 	static Parser::Handler::Ptr create(ContainerT& x) {
-		Parser::Handler::Ptr p(new Handler<value_type, ContainerT>(x) );
+		Parser::Handler::Ptr p(new Handler< Container<JsonType, value_type>, ContainerT>(x) );
 		return p;
 	}
 };
 
-template<bool canBeThis, typename ContainerT>
+template<JsonContainerType JsonType, typename ContainerT>
 static Parser::Handler::Ptr createSubHandler(ContainerT& x) {
-	return SubHandler<canBeThis, ContainerT>::create(x);
+	typedef typename ContainerT::value_type value_type;
+	static const bool enabled = (JsonType==Container<JsonType, value_type>::type);
+	typedef SubHandler<enabled , JsonType, ContainerT> SubHandlerT;
+	return SubHandlerT::create(x);
 }
 
-template<typename T, typename ParentT>
+template<typename ContainerT, typename ParentT>
 class Handler: public Parser::Handler {
-	typedef Container<T> ContainerT;
 	ContainerT container;
 	ParentT& parent;
 	typedef typename ContainerT::value_type value_type;
@@ -62,11 +64,11 @@ public:
 	}
 
 	Ptr object() override {
-		return createSubHandler< ContainerType<value_type>::canBeObject >( container );
+		return createSubHandler< JsonObject >( container );
 	}
 
 	Ptr array()  override {
-		return createSubHandler< ContainerType<value_type>::canBeArray >( container );
+		return createSubHandler< JsonArray >( container );
 	}
 
 	bool onParsed() override {
@@ -96,16 +98,15 @@ public:
  */
 template<typename T>
 class StartHandler: public Parser::BaseHandler {
-	typedef Container<T> ContainerT;
 	SwapContainer<T> swapper;
 public:
 	explicit StartHandler(T& d):swapper(d) {}
 	Ptr object() override {
-		return createSubHandler< ContainerType<T>::canBeObject >( swapper );
+		return createSubHandler< JsonObject >( swapper );
 	}
 
 	Ptr array()  override {
-		return createSubHandler< ContainerType<T>::canBeArray >( swapper );
+		return createSubHandler< JsonArray >( swapper );
 	}
 };
 

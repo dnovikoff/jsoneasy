@@ -15,8 +15,8 @@ namespace Template {
  * Support for map
  * Will fail parsing in case of multiple keys
  */
-template<typename K,typename V, typename C, typename A>
-class Container<std::map<K,V,C,A> > {
+template<JsonContainerType RequestedType, typename K,typename V, typename C, typename A>
+class Container<RequestedType, std::map<K,V,C,A> > {
 	typedef std::map<K,V,C,A> container_t;
 	std::string keyS;
 public:
@@ -40,8 +40,8 @@ public:
 /**
  * Support for multimap
  */
-template<typename K,typename V, typename C, typename A>
-class Container<std::multimap<K,V,C,A> > {
+template<JsonContainerType RequestedType, typename K,typename V, typename C, typename A>
+class Container<RequestedType, std::multimap<K,V,C,A> > {
 	typedef std::multimap<K,V,C,A> container_t;
 	std::string keyS;
 public:

@@ -15,8 +15,8 @@ namespace Template {
  * Support for set
  * Will fail parsing in case of multiple values
  */
-template<typename T, typename C, typename A>
-class Container<std::set<T,C,A > > {
+template<JsonContainerType RequestedType, typename T, typename C, typename A>
+class Container<RequestedType, std::set<T,C,A > > {
 	typedef std::set<T,C,A> container_t;
 public:
 	container_t data;
@@ -35,8 +35,8 @@ public:
 /**
  * Support for multiset
  */
-template<typename T, typename C, typename A>
-class Container<std::multiset<T,C,A > > {
+template<JsonContainerType RequestedType, typename T, typename C, typename A>
+class Container<RequestedType, std::multiset<T,C,A > > {
 	typedef std::multiset<T,C,A> container_t;
 public:
 	container_t data;
