@@ -1,11 +1,17 @@
-spirit2json
+JsonEasy
 ===========
 
-JSON parser made with Spirit2
+C++ JSON parser made with Spirit2
 
 - Use TABS for indentations
 - Use SPACES for aligment
 - Project to be build with bjam
+
+Now it is just a draft.
+To be done:
+- Add generator
+- Finish with existing template parser
+- Add tree parser, base on boost::variant
 
 Docs:
 - JSON specification http://www.json.org/
