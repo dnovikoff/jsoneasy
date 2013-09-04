@@ -6,6 +6,6 @@ template<typename T, typename A> class deque;
 } // namespace std
 
 // Follows default insert for arrays
-#include <jsoneasy/template/insert.hpp>
+#include <jsoneasy/template/container.hpp>
 
 #endif /* JSONEASY_TEMPLATE_DEQUE_HPP_ */

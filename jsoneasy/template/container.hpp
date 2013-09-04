@@ -17,12 +17,12 @@ enum JsonContainerType { JsonAny, JsonObject, JsonArray };
  * Default implementation are in "support" subfolder
  */
 template<typename T>
-class InsertHelper {
+class Container {
 	T& data;
 public:
 	static const JsonContainerType type = JsonArray;
 
-	explicit InsertHelper(T& d):data(d) {}
+	explicit Container(T& d):data(d) {}
 
 	template<typename X>
 	bool insert(X& x) {

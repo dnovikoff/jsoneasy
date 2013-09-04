@@ -6,6 +6,6 @@ template<typename T, typename A> class vector;
 } // namespace std
 
 // Follows default insert for arrays
-#include <jsoneasy/template/insert.hpp>
+#include <jsoneasy/template/container.hpp>
 
 #endif /* JSONEASY_TEMPLATE_VECTOR_HPP_ */

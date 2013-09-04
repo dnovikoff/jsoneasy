@@ -2,7 +2,7 @@
 #define JSONEASY_TEMPLATE_HANDLER_HPP_
 
 #include <jsoneasy/parser/handler.hpp>
-#include <jsoneasy/template/insert.hpp>
+#include <jsoneasy/template/container.hpp>
 
 namespace JsonEasy {
 namespace Template {
@@ -12,10 +12,9 @@ static const NullTag nullTag;
 
 template<typename T>
 class Handler: public Parser::Handler {
-	T& data;
-	InsertHelper<T> nv;
+	Container<T> nv;
 public:
-	explicit Handler(T& d):data(d), nv(d) {}
+	explicit Handler(T& d): nv(d) {}
 	bool operator()(int x) override {
 		return nv.insert(x);
 	}
@@ -53,13 +52,13 @@ public:
 	explicit StartHandler(T& d):data(d) {}
 	Ptr object() override {
 		// JsonAny will pass
-		if( InsertHelper<T>::type == JsonArray ) return Ptr();
+		if( Container<T>::type == JsonArray ) return Ptr();
 		Ptr p(new Template::Handler<T>(data));
 		return p;
 	}
 	Ptr array()  override {
 		// JsonAny will pass
-		if( InsertHelper<T>::type == JsonObject ) return Ptr();
+		if( Container<T>::type == JsonObject ) return Ptr();
 		Ptr p(new Template::Handler<T>(data));
 		return p;
 	}

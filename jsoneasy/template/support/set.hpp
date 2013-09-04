@@ -6,7 +6,7 @@ template<typename T, typename C, typename A> class set;
 template<typename T, typename C, typename A> class multiset;
 } // namespace std
 
-#include <jsoneasy/template/insert.hpp>
+#include <jsoneasy/template/container.hpp>
 
 namespace JsonEasy {
 namespace Template {
@@ -16,12 +16,12 @@ namespace Template {
  * Will fail parsing in case of multiple values
  */
 template<typename T, typename C, typename A>
-class InsertHelper<std::set<T,C,A > > {
+class Container<std::set<T,C,A > > {
 	typedef std::set<T,C,A> container_t;
 	container_t& data;
 public:
 	static const JsonContainerType type = JsonArray;
-	explicit InsertHelper(container_t& d):data(d) {}
+	explicit Container(container_t& d):data(d) {}
 
 	template<typename X>
 	bool insert(X& x) {
@@ -36,12 +36,12 @@ public:
  * Support for multiset
  */
 template<typename T, typename C, typename A>
-class InsertHelper<std::multiset<T,C,A > > {
+class Container<std::multiset<T,C,A > > {
 	typedef std::multiset<T,C,A> container_t;
 	container_t& data;
 public:
 	static const JsonContainerType type = JsonArray;
-	explicit InsertHelper(container_t& d):data(d) {}
+	explicit Container(container_t& d):data(d) {}
 
 	template<typename X>
 	bool insert(X& x) {

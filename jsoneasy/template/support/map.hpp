@@ -6,7 +6,7 @@ template<typename K, typename V, typename C, typename A> class map;
 template<typename K, typename V, typename C, typename A> class multimap;
 } // namespace std
 
-#include <jsoneasy/template/insert.hpp>
+#include <jsoneasy/template/container.hpp>
 
 namespace JsonEasy {
 namespace Template {
@@ -16,14 +16,14 @@ namespace Template {
  * Will fail parsing in case of multiple keys
  */
 template<typename K,typename V, typename C, typename A>
-class InsertHelper<std::map<K,V,C,A> > {
+class Container<std::map<K,V,C,A> > {
 	typedef std::map<K,V,C,A> container_t;
 	container_t& data;
 	std::string keyS;
 public:
 	static const JsonContainerType type = JsonObject;
 
-	explicit InsertHelper(container_t& d):data(d) {}
+	explicit Container(container_t& d):data(d) {}
 
 	template<typename X>
 	bool insert(X& x) {
@@ -42,14 +42,14 @@ public:
  * Support for multimap
  */
 template<typename K,typename V, typename C, typename A>
-class InsertHelper<std::multimap<K,V,C,A> > {
+class Container<std::multimap<K,V,C,A> > {
 	typedef std::multimap<K,V,C,A> container_t;
 	container_t& data;
 	std::string keyS;
 public:
 	static const JsonContainerType type = JsonObject;
 
-	explicit InsertHelper(container_t& d):data(d) {}
+	explicit Container(container_t& d):data(d) {}
 
 	template<typename X>
 	bool insert(X& x) {
