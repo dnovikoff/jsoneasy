@@ -1,44 +1,93 @@
 #ifndef JSONEASY_TEMPLATE_HANDLER_HPP_
 #define JSONEASY_TEMPLATE_HANDLER_HPP_
 
+#include <functional>
+
 #include <jsoneasy/parser/handler.hpp>
 #include <jsoneasy/template/container.hpp>
 
 namespace JsonEasy {
 namespace Template {
 
-struct NullTag {};
-static const NullTag nullTag;
+template<typename T, typename ParentT> class Handler;
 
-template<typename T>
+template<bool canBeThis, typename ContainerT>
+struct SubHandler {
+	static Parser::Handler::Ptr create(ContainerT&) {
+		return Parser::Handler::Ptr();
+	}
+};
+
+template<typename ContainerT>
+struct SubHandler<true, ContainerT> {
+	typedef typename ContainerT::value_type value_type;
+
+	static Parser::Handler::Ptr create(ContainerT& x) {
+		Parser::Handler::Ptr p(new Handler<value_type, ContainerT>(x) );
+		return p;
+	}
+};
+
+template<bool canBeThis, typename ContainerT>
+static Parser::Handler::Ptr createSubHandler(ContainerT& x) {
+	return SubHandler<canBeThis, ContainerT>::create(x);
+}
+
+template<typename T, typename ParentT>
 class Handler: public Parser::Handler {
-	Container<T> nv;
+	typedef Container<T> ContainerT;
+	ContainerT container;
+	ParentT& parent;
+	typedef typename ContainerT::value_type value_type;
 public:
-	explicit Handler(T& d): nv(d) {}
+	explicit Handler(ParentT& p): parent(p) {}
 	bool operator()(int x) override {
-		return nv.insert(x);
+		return container.insert(x);
 	}
 	bool operator()(bool x) override {
-		return nv.insert(x);
+		return container.insert(x);
 	}
 	bool operator()(double x) override {
-		return nv.insert(x);
+		return container.insert(x);
 	}
 	bool operator()(std::string& x) override {
-		return nv.insert(x);
+		return container.insert(x);
 	}
 	bool null() override {
-		return nv.insert(nullTag);
+		static NullTag nullTag; // Should be non const
+		return container.insert(nullTag);
 	}
 	bool key(std::string& k) override {
-		return nv.key(k);
+		return container.key(k);
 	}
 
-	Ptr object() override { return Ptr(); }
-	Ptr array()  override { return Ptr(); }
+	Ptr object() override {
+		return createSubHandler< ContainerType<value_type>::canBeObject >( container );
+	}
 
-	// Note that onParsed will return true by default
-	bool onParsed() override { return true; }
+	Ptr array()  override {
+		return createSubHandler< ContainerType<value_type>::canBeArray >( container );
+	}
+
+	bool onParsed() override {
+		parent.insert( container.data );
+		return true;
+	}
+};
+
+template<typename T>
+class SwapContainer {
+public:
+	T& data;
+
+	typedef T value_type;
+
+	explicit SwapContainer(T& d):data(d) {}
+
+	bool insert(T& newData) {
+		boost::swap( data, newData );
+		return true;
+	}
 };
 
 /**
@@ -47,20 +96,16 @@ public:
  */
 template<typename T>
 class StartHandler: public Parser::BaseHandler {
-	T& data;
+	typedef Container<T> ContainerT;
+	SwapContainer<T> swapper;
 public:
-	explicit StartHandler(T& d):data(d) {}
+	explicit StartHandler(T& d):swapper(d) {}
 	Ptr object() override {
-		// JsonAny will pass
-		if( Container<T>::type == JsonArray ) return Ptr();
-		Ptr p(new Template::Handler<T>(data));
-		return p;
+		return createSubHandler< ContainerType<T>::canBeObject >( swapper );
 	}
+
 	Ptr array()  override {
-		// JsonAny will pass
-		if( Container<T>::type == JsonObject ) return Ptr();
-		Ptr p(new Template::Handler<T>(data));
-		return p;
+		return createSubHandler< ContainerType<T>::canBeArray >( swapper );
 	}
 };
 
@@ -70,8 +115,6 @@ public:
  */
 template<typename T>
 Parser::Handler::Ptr createHandler(T& data) {
-	T empty;
-	boost::swap( data, empty );
 	Parser::Handler::Ptr p(new StartHandler<T>(data));
 	return p;
 }

@@ -2,6 +2,12 @@
 #define BOOST_TEST_MAIN
 
 #include <iostream>
+#include <vector>
+#include <list>
+#include <stack>
+#include <deque>
+
+#include <boost/optional.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/typeof/typeof.hpp>
@@ -9,11 +15,6 @@
 #include <jsoneasy/parser/string_parser.hpp>
 #include <jsoneasy/parser/exception.hpp>
 #include <jsoneasy/template.hpp>
-
-#include <vector>
-#include <list>
-#include <stack>
-#include <deque>
 
 #include <boost/assign.hpp>
 #include <boost/typeof/typeof.hpp>
@@ -54,10 +55,13 @@ static bool cequals(const R1& x1, const R2& x2) {
 
 template<typename T>
 static bool parseTo(const std::string& input, T& data) {
+	T tmp;
 	try {
-		JsonEasy::Parser::Handler::Ptr h = JsonEasy::Template::createHandler(data);
+		JsonEasy::Parser::Handler::Ptr h = JsonEasy::Template::createHandler(tmp);
 		JsonEasy::Parser::StringParser sp;
-		return sp.parse(input, h);
+		if( !sp.parse(input, h) ) return false;
+		boost::swap(tmp, data);
+		return true;
 	} catch(const JsonEasy::Parser::UnexpectedException&) {}
 	return false;
 }
@@ -187,13 +191,130 @@ BOOST_AUTO_TEST_CASE ( startTest ) {
 	BOOST_CHECK( parseTo("{}", x1) );
 }
 
+BOOST_AUTO_TEST_CASE ( doubleTest ) {
+	std::vector<double> x;
+	BOOST_CHECK( parseTo("[]", x) );
+
+	BOOST_CHECK( parseTo("[1.0,2.0]", x) );
+	{
+		std::vector<double> ethalon;
+		ethalon += 1.0,2.0;
+		BOOST_CHECK( cequals(x, ethalon) );
+	}
+
+	// special hack for integers as double
+	BOOST_REQUIRE( parseTo("[8.6,15,9.12]", x) );
+	{
+		std::vector<double> ethalon;
+		ethalon += 8.6,15,9.12;
+		BOOST_CHECK( cequals(x, ethalon) );
+	}
+}
+
+BOOST_AUTO_TEST_CASE ( boolTest ) {
+	std::vector<bool> x;
+	BOOST_CHECK( !parseTo("[1]", x) );
+	BOOST_CHECK( !parseTo("[null]", x) );
+	BOOST_CHECK( parseTo("[true]", x) );
+	BOOST_CHECK( parseTo("[false]", x) );
+	BOOST_CHECK( !parseTo("[ture]", x) );
+	BOOST_CHECK( !parseTo("[truefalse]", x) );
+
+	BOOST_CHECK( parseTo("[true,false]", x) );
+	{
+		std::vector<bool> ethalon;
+		ethalon += true, false;
+		BOOST_CHECK( cequals(x, ethalon) );
+	}
+}
+
+BOOST_AUTO_TEST_CASE ( nullTest ) {
+	std::vector<JsonEasy::Template::NullTag> x;
+	BOOST_REQUIRE( parseTo("[]", x) );
+	BOOST_REQUIRE( x.empty() );
+
+	BOOST_REQUIRE( parseTo("[null]", x) );
+	BOOST_CHECK_EQUAL( x.size(), 1u);
+
+	BOOST_REQUIRE( parseTo("[null, null, null ]", x) );
+
+	BOOST_CHECK_EQUAL( x.size(), 3u);
+}
+
+BOOST_AUTO_TEST_CASE ( optionalTest ) {
+	std::vector<boost::optional<int> > x;
+	BOOST_REQUIRE( parseTo("[1]", x) );
+	BOOST_REQUIRE( x.back().is_initialized() );
+	BOOST_CHECK_EQUAL( x.back(), 1);
+
+	BOOST_REQUIRE( parseTo("[null]", x) );
+	BOOST_REQUIRE( !x.back().is_initialized() );
+
+	BOOST_REQUIRE( parseTo("[1,null,2]", x) );
+	{
+		std::vector<boost::optional<int> > ethalon;
+		ethalon += 1, boost::optional<int>(), 2;
+		BOOST_CHECK( cequals(x, ethalon) );
+	}
+}
+
+BOOST_AUTO_TEST_CASE ( stringSimpleTest ) {
+	std::vector<std::string> x;
+
+	BOOST_REQUIRE( parseTo("[\"Hello\"]", x) );
+	BOOST_CHECK_EQUAL( x.back(), "Hello");
+
+	BOOST_REQUIRE( parseTo("[\"Hello\\\"World\"]", x) );
+	BOOST_CHECK_EQUAL( x.back(), "Hello\"World");
+
+	BOOST_REQUIRE( parseTo("[\"Hello\\\\\\\"World\"]", x) );
+	BOOST_CHECK_EQUAL( x.back(), "Hello\\\"World");
+
+	BOOST_REQUIRE( parseTo("[\"Hello\\\\\"]", x) );
+	BOOST_CHECK_EQUAL( x.back(), "Hello\\");
+
+	BOOST_REQUIRE( parseTo("[\"Hello\\t\\n\\t\"]", x) );
+	BOOST_CHECK_EQUAL( x.back(), "Hello\t\n\t");
+}
+
+BOOST_AUTO_TEST_CASE ( complexContainerTest ) {
+	typedef std::list<int> list_t;
+	typedef std::map<std::string, list_t> map_t;
+	typedef std::vector<map_t> vec_t;
+
+	vec_t x;
+	BOOST_REQUIRE( parseTo("[]", x) );
+	BOOST_REQUIRE( x.empty() );
+	BOOST_REQUIRE( !parseTo("[1]", x) );
+
+	BOOST_CHECK( !parseTo("[[]]", x) );
+	BOOST_CHECK( parseTo("[{}]", x) );
+	BOOST_CHECK( x.size() == 1u);
+	BOOST_CHECK( x.back().empty() );
+
+	BOOST_REQUIRE( parseTo("[{\"hello\":[]}]", x) );
+	BOOST_REQUIRE(x.size() == 1u);
+	BOOST_REQUIRE(x.back().size() == 1u);
+	BOOST_REQUIRE(x.back().begin()->first == "hello");
+	BOOST_REQUIRE(x.back().begin()->second.empty());
+
+	BOOST_REQUIRE( parseTo("[{\"hello\":[4,2,3]}]", x) );
+
+	BOOST_REQUIRE(x.size() == 1u);
+	BOOST_REQUIRE(x.back().size() == 1u);
+	const list_t& lst = x.back()["hello"];
+	{
+		std::vector<int> ethalon;
+		ethalon += 4,2,3;
+		BOOST_CHECK( cequals(lst, ethalon) );
+	}
+}
+
+// utf symbols tests
 // multimap
-// optional
 // double
 // multitype
 // int
-// bool
-// null
 
 //BOOST_AUTO_TEST_CASE ( mapWithNotStringKey ) {
 //	std::map<int, int> x;

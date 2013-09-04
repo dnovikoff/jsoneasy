@@ -18,10 +18,10 @@ namespace Template {
 template<typename T, typename C, typename A>
 class Container<std::set<T,C,A > > {
 	typedef std::set<T,C,A> container_t;
-	container_t& data;
 public:
+	container_t data;
+	typedef T value_type;
 	static const JsonContainerType type = JsonArray;
-	explicit Container(container_t& d):data(d) {}
 
 	template<typename X>
 	bool insert(X& x) {
@@ -38,10 +38,11 @@ public:
 template<typename T, typename C, typename A>
 class Container<std::multiset<T,C,A > > {
 	typedef std::multiset<T,C,A> container_t;
-	container_t& data;
 public:
+	container_t data;
+
+	typedef T value_type;
 	static const JsonContainerType type = JsonArray;
-	explicit Container(container_t& d):data(d) {}
 
 	template<typename X>
 	bool insert(X& x) {

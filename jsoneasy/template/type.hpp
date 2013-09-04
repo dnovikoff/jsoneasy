@@ -4,6 +4,18 @@
 namespace JsonEasy {
 namespace Template {
 
+struct NullTag {};
+
+template<typename T>
+struct IsNullTag {
+	static const bool value = false;
+};
+
+template<>
+struct IsNullTag<NullTag> {
+	static const bool value = true;
+};
+
 /**
  * Describes how User Types converts with Simple types
  * Not allowed to convert by default
@@ -21,6 +33,15 @@ template<typename T>
 struct Type<T,T> {
 	static bool jsonToUser(T& json, T& user) {
 		user = std::move(json);
+		return true;
+	}
+};
+
+// Special hack for double. Integers accepted to doubles
+template<>
+struct Type<int, double> {
+	static bool jsonToUser(int& json, double& user) {
+		user = static_cast<double>(json);
 		return true;
 	}
 };
