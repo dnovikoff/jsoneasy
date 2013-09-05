@@ -44,22 +44,6 @@ public:
 	typedef NotContainerTag ValueType;
 };
 
-template<typename T>
-struct IsNotContainerTag {
-	static const bool value = false;
-};
-
-template<>
-struct IsNotContainerTag<NotContainerTag> {
-	static const bool value = true;
-};
-
-template<JsonContainerType RequestedType, typename T>
-struct GetContainerType {
-	typedef typename Container<RequestedType,T>::ValueType ValueType;
-	static const JsonContainerType value = IsNotContainerTag<ValueType>::value?NotContainer:RequestedType;
-};
-
 } // namespace Template
 } // namespace JsonEasy
 

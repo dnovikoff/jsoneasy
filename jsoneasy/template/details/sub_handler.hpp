@@ -24,6 +24,22 @@ struct SubHandler<true, JsonType, VT, ParentAssist> {
 	}
 };
 
+template<typename T>
+struct IsNotContainerTag {
+	static const bool value = false;
+};
+
+template<>
+struct IsNotContainerTag<NotContainerTag> {
+	static const bool value = true;
+};
+
+template<JsonContainerType RequestedType, typename T>
+struct GetContainerType {
+	typedef typename Container<RequestedType,T>::ValueType ValueType;
+	static const JsonContainerType value = IsNotContainerTag<ValueType>::value?NotContainer:RequestedType;
+};
+
 template<JsonContainerType JsonType, typename HandlerT>
 static Parser::Handler::Ptr createSubHandler(HandlerT& h) {
 	typedef typename HandlerT::ContainerType::ValueType SubValueType;
