@@ -9,7 +9,7 @@
 namespace JsonEasy {
 namespace Template {
 
-template<typename T, typename ParentT> class Handler;
+template<JsonContainerType JsonType, typename ValueType, typename ParentT> class Handler;
 
 template<bool enable, JsonContainerType JsonType, typename ContainerT>
 struct SubHandler {
@@ -23,7 +23,7 @@ struct SubHandler<true, JsonType, ContainerT> {
 	typedef typename ContainerT::value_type value_type;
 
 	static Parser::Handler::Ptr create(ContainerT& x) {
-		Parser::Handler::Ptr p(new Handler< Container<JsonType, value_type>, ContainerT>(x) );
+		Parser::Handler::Ptr p(new Handler< JsonType, value_type, ContainerT>(x) );
 		return p;
 	}
 };
@@ -36,8 +36,21 @@ static Parser::Handler::Ptr createSubHandler(ContainerT& x) {
 	return SubHandlerT::create(x);
 }
 
-template<typename ContainerT, typename ParentT>
+template<bool enable>
+struct Key {
+	template<typename T>
+	static bool key(T& , std::string&) { return false; }
+};
+
+template<>
+struct Key<true> {
+	template<typename T>
+	static bool key(T& c, std::string& x) { return c.key(x); }
+};
+
+template<JsonContainerType JsonType, typename ValueType, typename ParentT>
 class Handler: public Parser::Handler {
+	typedef Container<JsonType, ValueType> ContainerT;
 	ContainerT container;
 	ParentT& parent;
 	typedef typename ContainerT::value_type value_type;
@@ -60,7 +73,7 @@ public:
 		return container.insert(nullTag);
 	}
 	bool key(std::string& k) override {
-		return container.key(k);
+		return Key<JsonType==JsonObject>::key(container, k);
 	}
 
 	Ptr object() override {

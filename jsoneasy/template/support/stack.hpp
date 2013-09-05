@@ -25,7 +25,6 @@ public:
 		data.push( std::move(tmp) );
 		return true;
 	}
-	bool key(std::string&) { return false; }
 };
 
 } // namespace Template

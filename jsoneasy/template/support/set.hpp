@@ -29,7 +29,6 @@ public:
 		if( !jsonToUser(x, tmp) ) return false;
 		return data.insert( std::move(tmp) ).second;
 	}
-	bool key(std::string&) { return false; }
 };
 
 /**
@@ -51,7 +50,6 @@ public:
 		data.insert( std::move(tmp) );
 		return true;
 	}
-	bool key(std::string&) { return false; }
 };
 
 } // namespace Template
