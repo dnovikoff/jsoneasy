@@ -5,7 +5,7 @@
  * Includes all helpers for all containers and types
  */
 
-#include <jsoneasy/template/handler.hpp>
+#include <jsoneasy/template/create.hpp>
 
 #include <jsoneasy/template/support/list.hpp>
 #include <jsoneasy/template/support/vector.hpp>
