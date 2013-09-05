@@ -25,6 +25,8 @@ public:
 	bool insert(ValueType& x) {
 		return data.insert( std::move(x) ).second;
 	}
+
+	bool validate() { return true; }
 };
 
 /**
@@ -41,6 +43,8 @@ public:
 		data.insert( std::move(x) );
 		return true;
 	}
+
+	bool validate() { return true; }
 };
 
 } // namespace Template

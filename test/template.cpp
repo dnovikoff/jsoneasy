@@ -323,6 +323,55 @@ BOOST_AUTO_TEST_CASE ( mapWitCustomKey ) {
 	BOOST_CHECK_EQUAL( x.at(0), 18);
 }
 
+BOOST_AUTO_TEST_CASE( pairTest ) {
+	std::pair<int,bool> x;
+	// exactly two elements
+	BOOST_CHECK( !parseTo("[]", x) );
+	BOOST_CHECK( !parseTo("[1]", x) );
+	BOOST_CHECK( !parseTo("[1,2]", x) );
+	BOOST_CHECK( !parseTo("[1,true,1]", x) );
+	BOOST_CHECK( !parseTo("[1,true,false]", x) );
+	BOOST_CHECK( !parseTo("[true,1]", x) );
+
+	// of the correct type
+	BOOST_CHECK( parseTo("[1,true]", x) );
+	BOOST_CHECK_EQUAL( x.first, 1);
+	BOOST_CHECK_EQUAL( x.second, true);
+
+	BOOST_CHECK( parseTo("[7,false]", x) );
+	BOOST_CHECK_EQUAL( x.first, 7);
+	BOOST_CHECK_EQUAL( x.second, false);
+}
+
+BOOST_AUTO_TEST_CASE( complexPairTest ) {
+	// complex first
+	{
+		std::pair<std::vector<bool>,int> x;
+		BOOST_CHECK( parseTo("[[],1]", x) );
+		BOOST_CHECK( !parseTo("[{},1]", x) );
+		BOOST_CHECK( parseTo("[[false,false,true],1]", x) );
+		BOOST_CHECK( !parseTo("[[false,false,true],[]]", x) );
+		BOOST_CHECK( !parseTo("[[false,false,true],{}]", x) );
+	}
+	// complex second
+	{
+		std::pair<int, std::vector<bool>> x;
+		BOOST_CHECK( parseTo("[1,[]]", x) );
+		BOOST_CHECK( !parseTo("[1,{}]", x) );
+		BOOST_CHECK( parseTo("[1,[false,false,true]]", x) );
+		BOOST_CHECK_EQUAL( x.second.size(), 3u);
+	}
+	// complex both
+	{
+		typedef std::pair<std::string, boost::optional<double> > t1;
+		typedef std::pair<int, std::vector<int> > t2;
+		typedef std::pair<t1, t2> t3;
+		t3 x;
+		BOOST_CHECK( !parseTo("[[],[]]", x) );
+		BOOST_CHECK( parseTo("[[\"hi\",null],[1,[]]]", x) );
+	}
+}
+
 // class type key test
 // class type container test
 // class type value test

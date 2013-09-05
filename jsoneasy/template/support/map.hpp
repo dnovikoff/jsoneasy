@@ -27,6 +27,8 @@ public:
 		auto p = std::make_pair(std::move(key), std::move(val));
 		return data.insert(std::move(p)).second;
 	}
+
+	bool validate() { return true; }
 };
 
 /**
@@ -45,6 +47,8 @@ public:
 		data.insert(std::move(p)).second;
 		return true;
 	}
+
+	bool validate() { return true; }
 };
 
 } // namespace Template

@@ -21,6 +21,8 @@ public:
 		data.push( std::move(x) );
 		return true;
 	}
+
+	bool validate() { return true; }
 };
 
 } // namespace Template

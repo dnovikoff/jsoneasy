@@ -53,6 +53,8 @@ public:
 	}
 
 	bool onParsed() override {
+		// last chance to check content (i.e size)
+		if( !container.validate() ) return false;
 		parentAssist.insert( container.data );
 		return true;
 	}
