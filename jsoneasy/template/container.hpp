@@ -16,8 +16,28 @@ enum JsonContainerType { NotContainer, JsonObject, JsonArray };
 
 struct NotContainerTag {};
 
-// RequestedType is usefull in case of JsonAny type
-// To determinate type of parsed container
+/**
+ * There are two types of contianers: JsonObject, JsonArray
+ * NotContainer - is just a special value. Instances with this template
+ * parameter will newer be created
+ *
+ * Create you own specialization for any classes
+ *
+ * Requirement from RequestedType=JsonArray
+ * public member "T data". Will be moved to parent container (not copited)
+ * typedef with name ValueType. It points on the type of the container values
+ * and used to create subhandlers
+ * explicit SwapContainer(T& d):data(d) {}
+ *
+ * template<typename X> bool insert(X& x);
+ * This shows how to add parsed data to your collection ( use jsonToUser ) to finaly convert value
+ * return false if value not parsed successfuly. Ex.: set returns false in case of dublicate values
+ *
+ * Requirement from RequestedType=JsonObject
+ * Same as above, but with other insert signature
+ * template<typename X> bool insert(std::string& key, X& x);
+ * where key is your key
+ */
 template<JsonContainerType RequestedType, typename T>
 class Container {
 public:
