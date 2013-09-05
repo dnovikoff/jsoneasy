@@ -20,11 +20,15 @@ public:
 	explicit ContainerAssist(ContainerT& c):container(c) {}
 	bool key(std::string&) { return false; }
 
+	bool insert(ValueType& v) {
+		return container.insert(v);
+	}
+
 	template<typename T>
 	bool insert(T& v) {
 		ValueType tmp;
 		if( !jsonToUser(v, tmp) ) return false;
-		return container.insert(tmp);
+		return insert(tmp);
 	}
 };
 
@@ -44,11 +48,15 @@ public:
 		return Key<KeyType>::convert(k, tmpKey);
 	}
 
+	bool insert(ValueType& v) {
+		return container.insert(tmpKey, v);
+	}
+
 	template<typename T>
 	bool insert(T& v) {
 		ValueType tmp;
 		if( !jsonToUser(v, tmp) ) return false;
-		return container.insert(tmpKey, tmp);
+		return insert(tmp);
 	}
 };
 

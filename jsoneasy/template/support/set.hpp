@@ -37,11 +37,8 @@ public:
 	SetType data;
 	typedef T ValueType;
 
-	template<typename X>
-	bool insert(X& x) {
-		T tmp;
-		if( !jsonToUser(x, tmp) ) return false;
-		data.insert( std::move(tmp) );
+	bool insert(ValueType& x) {
+		data.insert( std::move(x) );
 		return true;
 	}
 };

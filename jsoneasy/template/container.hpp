@@ -16,6 +16,9 @@ enum JsonContainerType { NotContainer, JsonObject, JsonArray };
 
 struct NotContainerTag {};
 
+// Use as value type in case container could consist of different types (object, pair, tuple)
+struct AnyType {};
+
 /**
  * There are two types of contianers: JsonObject, JsonArray
  * NotContainer - is just a special value. Instances with this template
