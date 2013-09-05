@@ -41,5 +41,7 @@ include <jsoneasy/template.hpp> to include Template with support of all containe
 **or** you can include support for only types you need. Like:
 
 \#include \<jsonyeasy/template/create.hpp\>
+
 \#include \<jsonyeasy/template/support/vector.hpp\>
+
 \#include \<jsonyeasy/template/support/optional.hpp\>
