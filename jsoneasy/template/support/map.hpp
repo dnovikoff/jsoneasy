@@ -19,14 +19,12 @@ template<typename K,typename V, typename C, typename A>
 class Container<JsonObject, std::map<K,V,C,A> > {
 	typedef std::map<K,V,C,A> MapType;
 public:
-	typedef V ValueType;
 	MapType data;
+	typedef V ValueType;
+	typedef K KeyType;
 
-	template<typename X>
-	bool insert(std::string& key, X& x) {
-		V tmp;
-		if( !jsonToUser(x, tmp) ) return false;
-		auto p = std::make_pair(std::move(key), std::move(tmp));
+	bool insert(KeyType& key, ValueType& val) {
+		auto p = std::make_pair(std::move(key), std::move(val));
 		return data.insert(std::move(p)).second;
 	}
 };
@@ -40,12 +38,10 @@ class Container<JsonObject, std::multimap<K,V,C,A> > {
 public:
 	MapType data;
 	typedef V ValueType;
+	typedef K KeyType;
 
-	template<typename X>
-	bool insert(std::string& key, X& x) {
-		V tmp;
-		if( !jsonToUser(x, tmp) ) return false;
-		auto p = std::make_pair(std::move(key), std::move(tmp));
+	bool insert(KeyType& key, ValueType& val) {
+		auto p = std::make_pair(std::move(key), std::move(val));
 		data.insert(std::move(p)).second;
 		return true;
 	}

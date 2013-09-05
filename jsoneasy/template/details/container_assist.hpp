@@ -14,12 +14,17 @@ namespace Details  {
 template<bool isObject, typename ContainerT>
 class ContainerAssist {
 	ContainerT& container;
+	typedef typename ContainerT::ValueType ValueType;
 public:
 	explicit ContainerAssist(ContainerT& c):container(c) {}
 	bool key(std::string&) { return false; }
 
 	template<typename T>
-	bool insert(T& x) { return container.insert(x); }
+	bool insert(T& v) {
+		ValueType tmp;
+		if( !jsonToUser(v, tmp) ) return false;
+		return container.insert(tmp);
+	}
 };
 
 /**
@@ -29,6 +34,8 @@ template<typename ContainerT>
 class ContainerAssist<true, ContainerT> {
 	ContainerT& container;
 	std::string tmpKey;
+	typedef typename ContainerT::ValueType ValueType;
+	typedef typename ContainerT::KeyType KeyType;
 public:
 	explicit ContainerAssist(ContainerT& c):container(c) {}
 	bool key(std::string& k) {
@@ -38,7 +45,9 @@ public:
 
 	template<typename T>
 	bool insert(T& v) {
-		return container.insert(tmpKey, v);
+		ValueType tmp;
+		if( !jsonToUser(v, tmp) ) return false;
+		return container.insert(tmpKey, tmp);
 	}
 };
 

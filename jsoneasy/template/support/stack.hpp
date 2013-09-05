@@ -17,11 +17,8 @@ public:
 	StackType data;
 	typedef T ValueType;
 
-	template<typename X>
-	bool insert(X& x) {
-		T tmp;
-		if( !jsonToUser(x, tmp) ) return false;
-		data.push( std::move(tmp) );
+	bool insert(ValueType& x) {
+		data.push( std::move(x) );
 		return true;
 	}
 };

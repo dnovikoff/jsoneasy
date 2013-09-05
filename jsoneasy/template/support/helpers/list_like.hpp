@@ -12,11 +12,8 @@ public:
 	T data;
 	typedef typename T::value_type ValueType;
 
-	template<typename X>
-	bool insert(X& x) {
-		ValueType tmp;
-		if( !jsonToUser(x, tmp) ) return false;
-		data.push_back( std::move(tmp) );
+	bool insert(ValueType& x) {
+		data.push_back( std::move(x) );
 		return true;
 	}
 };
