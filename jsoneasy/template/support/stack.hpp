@@ -10,8 +10,8 @@ template<typename T, typename D> class stack;
 namespace JsonEasy {
 namespace Template {
 
-template<JsonContainerType RequestedType, typename T, typename D>
-class Container<RequestedType, std::stack<T,D> > {
+template<typename T, typename D>
+class Container<JsonArray, std::stack<T,D> > {
 	typedef std::stack<T,D> container_t;
 public:
 	container_t data;
