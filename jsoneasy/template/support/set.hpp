@@ -20,7 +20,7 @@ class Container<RequestedType, std::set<T,C,A > > {
 	typedef std::set<T,C,A> container_t;
 public:
 	container_t data;
-	typedef T value_type;
+	typedef T ValueType;
 	static const JsonContainerType type = JsonArray;
 
 	template<typename X>
@@ -40,7 +40,7 @@ class Container<RequestedType, std::multiset<T,C,A > > {
 public:
 	container_t data;
 
-	typedef T value_type;
+	typedef T ValueType;
 	static const JsonContainerType type = JsonArray;
 
 	template<typename X>

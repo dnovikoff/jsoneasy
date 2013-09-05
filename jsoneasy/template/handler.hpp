@@ -11,81 +11,108 @@ namespace Template {
 
 template<JsonContainerType JsonType, typename ValueType, typename ParentT> class Handler;
 
-template<bool enable, JsonContainerType JsonType, typename ContainerT>
+template<bool enable, JsonContainerType JsonType, typename VT, typename ParentAssist>
 struct SubHandler {
-	static Parser::Handler::Ptr create(ContainerT&) {
+	static Parser::Handler::Ptr create(ParentAssist&) {
 		return Parser::Handler::Ptr();
 	}
 };
 
-template<JsonContainerType JsonType, typename ContainerT>
-struct SubHandler<true, JsonType, ContainerT> {
-	typedef typename ContainerT::value_type value_type;
-
-	static Parser::Handler::Ptr create(ContainerT& x) {
-		Parser::Handler::Ptr p(new Handler< JsonType, value_type, ContainerT>(x) );
+template<JsonContainerType JsonType, typename VT, typename ParentAssist>
+struct SubHandler<true, JsonType, VT, ParentAssist> {
+	static Parser::Handler::Ptr create(ParentAssist& assist) {
+		Parser::Handler::Ptr p(new Handler< JsonType, VT, ParentAssist>(assist) );
 		return p;
 	}
 };
 
-template<JsonContainerType JsonType, typename ContainerT>
-static Parser::Handler::Ptr createSubHandler(ContainerT& x) {
-	typedef typename ContainerT::value_type value_type;
-	static const bool enabled = (JsonType==Container<JsonType, value_type>::type);
-	typedef SubHandler<enabled , JsonType, ContainerT> SubHandlerT;
-	return SubHandlerT::create(x);
+template<JsonContainerType JsonType, typename HandlerT>
+static Parser::Handler::Ptr createSubHandler(HandlerT& h) {
+	typedef typename HandlerT::ContainerType::ValueType SubValueType;
+	static const bool enabled = (JsonType==Container<JsonType, SubValueType>::type);
+	typedef SubHandler<enabled , JsonType, SubValueType, typename HandlerT::AssistType> SubHandlerT;
+	return SubHandlerT::create(h.assist);
 }
 
-template<bool enable>
-struct Key {
-	template<typename T>
-	static bool key(T& , std::string&) { return false; }
-};
-
-template<>
-struct Key<true> {
-	template<typename T>
-	static bool key(T& c, std::string& x) { return c.key(x); }
-};
-
-template<JsonContainerType JsonType, typename ValueType, typename ParentT>
-class Handler: public Parser::Handler {
-	typedef Container<JsonType, ValueType> ContainerT;
-	ContainerT container;
-	ParentT& parent;
-	typedef typename ContainerT::value_type value_type;
+/**
+ * Assist will call different functions, depending on object type
+ * This one is for JsonArray type
+ */
+template<bool isObject, typename ContainerT>
+class InsertAssist {
+	ContainerT& container;
 public:
-	explicit Handler(ParentT& p): parent(p) {}
+	explicit InsertAssist(ContainerT& c):container(c) {}
+	bool key(std::string&) { return false; }
+
+	template<typename T>
+	bool insert(T& x) { return container.insert(x); }
+};
+
+/**
+ * * This one is for JsonObject type
+ */
+template<typename ContainerT>
+class InsertAssist<true, ContainerT> {
+	ContainerT& container;
+	std::string tmpKey;
+public:
+	explicit InsertAssist(ContainerT& c):container(c) {}
+	bool key(std::string& k) {
+		k.swap(tmpKey);
+		return true;
+	}
+
+	template<typename T>
+	bool insert(T& v) {
+		return container.insert(tmpKey, v);
+	}
+};
+
+template<JsonContainerType JsonType, typename VT, typename ParentAssist>
+class Handler: public Parser::Handler {
+public:
+	typedef Container<JsonType, VT> ContainerType;
+	typedef VT ValueType;
+	static const bool isObject = (JsonType==JsonObject);
+	typedef InsertAssist<isObject, ContainerType> AssistType;
+private:
+	ContainerType container;
+	ParentAssist& parentAssist;
+public:
+	AssistType assist;
+
+	explicit Handler(ParentAssist& p): parentAssist(p), assist(container) {}
 	bool operator()(int x) override {
-		return container.insert(x);
+		return assist.insert(x);
 	}
 	bool operator()(bool x) override {
-		return container.insert(x);
+		return assist.insert(x);
 	}
 	bool operator()(double x) override {
-		return container.insert(x);
+		return assist.insert(x);
 	}
 	bool operator()(std::string& x) override {
-		return container.insert(x);
+		return assist.insert(x);
 	}
 	bool null() override {
 		static NullTag nullTag; // Should be non const
-		return container.insert(nullTag);
+		return assist.insert(nullTag);
 	}
 	bool key(std::string& k) override {
-		return Key<JsonType==JsonObject>::key(container, k);
+		return assist.key(k);
 	}
 
 	Ptr object() override {
-		return createSubHandler< JsonObject >( container );
+		return createSubHandler< JsonObject >( *this );
 	}
 
 	Ptr array()  override {
-		return createSubHandler< JsonArray >( container );
+		return createSubHandler< JsonArray >( *this );
 	}
 
 	bool onParsed() override {
-		parent.insert( container.data );
+		parentAssist.insert( container.data );
 		return true;
 	}
 };
@@ -95,7 +122,7 @@ class SwapContainer {
 public:
 	T& data;
 
-	typedef T value_type;
+	typedef T ValueType;
 
 	explicit SwapContainer(T& d):data(d) {}
 
@@ -111,15 +138,21 @@ public:
  */
 template<typename T>
 class StartHandler: public Parser::BaseHandler {
-	SwapContainer<T> swapper;
 public:
-	explicit StartHandler(T& d):swapper(d) {}
+	typedef SwapContainer<T> ContainerType;
+	typedef T ValueType;
+	typedef InsertAssist<false, ContainerType> AssistType;
+private:
+	ContainerType swapper;
+public:
+	AssistType assist;
+	explicit StartHandler(T& d):swapper(d), assist(swapper) {}
 	Ptr object() override {
-		return createSubHandler< JsonObject >( swapper );
+		return createSubHandler< JsonObject >( *this );
 	}
 
 	Ptr array()  override {
-		return createSubHandler< JsonArray >( swapper );
+		return createSubHandler< JsonArray >( *this );
 	}
 };
 

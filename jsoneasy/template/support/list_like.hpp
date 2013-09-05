@@ -13,13 +13,13 @@ public:
 
 	typedef Parser::Handler::Ptr Ptr;
 	typedef T DataType;
-	typedef typename T::value_type value_type;
+	typedef typename T::value_type ValueType;
 
 	static const JsonContainerType type = JsonArray;
 
 	template<typename X>
 	bool insert(X& x) {
-		typename T::value_type tmp;
+		ValueType tmp;
 		if( !jsonToUser(x, tmp) ) return false;
 		data.push_back( std::move(tmp) );
 		return true;
