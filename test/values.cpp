@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_CASE ( optionalTest ) {
 	}
 }
 
-BOOST_AUTO_TEST_CASE ( stringSimpleTest ) {
+BOOST_AUTO_TEST_CASE ( stringSimpleEscapingTest ) {
 	std::vector<std::string> x;
 
 	BOOST_REQUIRE( parseTo("[\"Hello\"]", x) );
@@ -323,10 +323,15 @@ BOOST_AUTO_TEST_CASE ( mapWitCustomKey ) {
 	BOOST_CHECK_EQUAL( x.at(0), 18);
 }
 
+// support for pair and tuple
 // utf symbols tests
 // multitype (object+array)
 // int64
 // uint
+// char
+// test for negative parsing to uint
+// test for parsing value over numeric limits
+// test for 1000 trying to parse to char type
 // size_t
 // negative keys for size_t
 
