@@ -323,6 +323,10 @@ BOOST_AUTO_TEST_CASE ( mapWitCustomKey ) {
 	BOOST_CHECK_EQUAL( x.at(0), 18);
 }
 
+// class type key test
+// class type container test
+// class type value test
+
 // support for pair and tuple
 // utf symbols tests
 // multitype (object+array)
