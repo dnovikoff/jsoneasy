@@ -17,11 +17,10 @@ namespace Template {
  */
 template<typename K,typename V, typename C, typename A>
 class Container<JsonObject, std::map<K,V,C,A> > {
-	typedef std::map<K,V,C,A> container_t;
+	typedef std::map<K,V,C,A> MapType;
 public:
 	typedef V ValueType;
-	container_t data;
-	static const JsonContainerType type = JsonObject;
+	MapType data;
 
 	template<typename X>
 	bool insert(std::string& key, X& x) {
@@ -37,11 +36,10 @@ public:
  */
 template<typename K,typename V, typename C, typename A>
 class Container<JsonObject, std::multimap<K,V,C,A> > {
-	typedef std::multimap<K,V,C,A> container_t;
+	typedef std::multimap<K,V,C,A> MapType;
 public:
-	container_t data;
+	MapType data;
 	typedef V ValueType;
-	static const JsonContainerType type = JsonObject;
 
 	template<typename X>
 	bool insert(std::string& key, X& x) {

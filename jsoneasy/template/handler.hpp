@@ -29,7 +29,7 @@ struct SubHandler<true, JsonType, VT, ParentAssist> {
 template<JsonContainerType JsonType, typename HandlerT>
 static Parser::Handler::Ptr createSubHandler(HandlerT& h) {
 	typedef typename HandlerT::ContainerType::ValueType SubValueType;
-	static const bool enabled = (JsonType==Container<JsonType, SubValueType>::type);
+	static const bool enabled = (JsonType==GetContainerType<JsonType, SubValueType>::value);
 	typedef SubHandler<enabled , JsonType, SubValueType, typename HandlerT::AssistType> SubHandlerT;
 	return SubHandlerT::create(h.assist);
 }

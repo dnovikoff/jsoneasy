@@ -12,11 +12,10 @@ namespace Template {
 
 template<typename T, typename D>
 class Container<JsonArray, std::stack<T,D> > {
-	typedef std::stack<T,D> container_t;
+	typedef std::stack<T,D> StackType;
 public:
-	container_t data;
+	StackType data;
 	typedef T ValueType;
-	static const JsonContainerType type = JsonArray;
 
 	template<typename X>
 	bool insert(X& x) {

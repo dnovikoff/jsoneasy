@@ -10,12 +10,7 @@ template<typename T>
 class ListContainer {
 public:
 	T data;
-
-	typedef Parser::Handler::Ptr Ptr;
-	typedef T DataType;
 	typedef typename T::value_type ValueType;
-
-	static const JsonContainerType type = JsonArray;
 
 	template<typename X>
 	bool insert(X& x) {
