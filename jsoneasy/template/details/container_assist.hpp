@@ -2,6 +2,7 @@
 #define JSONEASY_TEMPLATE_DETAILS_CONTAINER_ASSIST_HPP_
 
 #include <string>
+#include <jsoneasy/template/key.hpp>
 
 namespace JsonEasy {
 namespace Template {
@@ -32,15 +33,15 @@ public:
  */
 template<typename ContainerT>
 class ContainerAssist<true, ContainerT> {
-	ContainerT& container;
-	std::string tmpKey;
 	typedef typename ContainerT::ValueType ValueType;
 	typedef typename ContainerT::KeyType KeyType;
+
+	ContainerT& container;
+	KeyType tmpKey;
 public:
 	explicit ContainerAssist(ContainerT& c):container(c) {}
 	bool key(std::string& k) {
-		k.swap(tmpKey);
-		return true;
+		return Key<KeyType>::convert(k, tmpKey);
 	}
 
 	template<typename T>

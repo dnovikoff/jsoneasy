@@ -310,13 +310,23 @@ BOOST_AUTO_TEST_CASE ( complexContainerTest ) {
 	}
 }
 
-// utf symbols tests
-// multimap
-// double
-// multitype
-// int
+/**
+ * Object keys in JSON a declraed to be only of string type.
+ * But we want implicit conversion to work
+ */
+BOOST_AUTO_TEST_CASE ( mapWitCustomKey ) {
+	std::map<int, int> x;
+	BOOST_CHECK( parseTo("{}", x) );
+	BOOST_REQUIRE( parseTo("{\"6\": 4,\"0\": 18}", x) );
+	BOOST_REQUIRE_EQUAL( x.size(), 2u );
+	BOOST_CHECK_EQUAL( x.at(6), 4);
+	BOOST_CHECK_EQUAL( x.at(0), 18);
+}
 
-//BOOST_AUTO_TEST_CASE ( mapWithNotStringKey ) {
-//	std::map<int, int> x;
-//	parseTo("{}", x);
-//}
+// utf symbols tests
+// multitype (object+array)
+// int64
+// uint
+// size_t
+// negative keys for size_t
+
