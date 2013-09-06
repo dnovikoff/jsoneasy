@@ -38,12 +38,15 @@ public:
 	bool validate() { return index==2; } // exactly two elements
 
 	template<typename C>
-	void create(C& x) {
+	bool create(C& x) {
 		if( index == 0) {
 			x.create<typename PairType::first_type>();
 		} else if( index == 1) {
 			x.create<typename PairType::second_type>();
+		} else {
+			return false;
 		}
+		return true;
 	}
 };
 

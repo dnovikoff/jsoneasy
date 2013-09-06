@@ -6,6 +6,7 @@ template<class... Types> class tuple;
 } // namespace std
 
 #include <jsoneasy/template/container.hpp>
+#include <jsoneasy/template/visitors.hpp>
 
 namespace JsonEasy {
 namespace Template {
@@ -13,52 +14,26 @@ namespace Template {
 template<bool enable, size_t Iterator, typename TupleType>
 struct IndexHelper {
 	template<typename T>
-	static void apply(TupleType&, const size_t, T&) {}
+	static bool apply(TupleType&, const size_t, T&) { return false; }
 };
 
 template< size_t Iterator, typename TupleType>
 struct IndexHelper<true, Iterator, TupleType> {
-	template<typename T>
-	static void apply(TupleType& t, const size_t index, T& act) {
+	template<typename VisitorType>
+	static bool apply(TupleType& t, const size_t index, VisitorType& visitor) {
 		if(Iterator == index) {
-			act(std::get<Iterator>(t));
-			return;
+			return visitor(std::get<Iterator>(t));
 		}
 		static const size_t NextIterator = Iterator + 1;
 		static const size_t tupleSize = std::tuple_size<TupleType>::value;
-		static const bool enabled = NextIterator<tupleSize;
-		IndexHelper< enabled, NextIterator, TupleType>::apply(t, index, act);
-	}
-};
-
-template<typename CreatorType>
-class CreateAction {
-	CreatorType& creator;
-public:
-	explicit CreateAction(CreatorType& c):creator(c) {}
-
-	template<typename T>
-	void operator()(T&) {
-		creator.template create<T>();
-	}
-};
-
-template<typename ParsedType>
-class InsertAction {
-	ParsedType parsed;
-public:
-	bool result;
-	explicit InsertAction(ParsedType& p):parsed(p),result(false) {}
-
-	template<typename T>
-	void operator()(T& x) {
-		result = jsonToUser(parsed, x);
+		static const bool enabled = NextIterator < tupleSize;
+		return IndexHelper< enabled, NextIterator, TupleType>::apply(t, index, visitor);
 	}
 };
 
 template<typename TupleType, typename ActionType>
-static void applyIndexHelper(TupleType& t, const size_t index, ActionType& act) {
-	IndexHelper<true, 0u, TupleType>::apply(t, index, act);
+static bool applyIndexHelper(TupleType& t, const size_t index, ActionType& act) {
+	return IndexHelper<true, 0u, TupleType>::apply(t, index, act);
 }
 
 template<typename... Types>
@@ -77,9 +52,8 @@ public:
 	// but we also need to take care of correct conversion
 	template<typename T>
 	bool insert(T& x) {
-		InsertAction<T> ia(x);
-		applyIndexHelper(data, index, ia);
-		if(!ia.result) return false;
+		InsertVisitor<T> ia(x);
+		if(!applyIndexHelper(data, index, ia)) return false;
 		++index;
 		return true;
 	}
@@ -87,9 +61,9 @@ public:
 	bool validate() { return index == tupleSize; } // exactly X elements
 
 	template<typename C>
-	void create(C& x) {
-		CreateAction<C> ca(x);
-		applyIndexHelper(data, index, ca);
+	bool create(C& x) {
+		CreateVisitor<C> ca(x);
+		return applyIndexHelper(data, index, ca);
 	}
 };
 

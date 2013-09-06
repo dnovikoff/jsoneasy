@@ -10,10 +10,13 @@ vector, list, deque
 map, multimap
 set, multiset
 stack
+pair
+tuple
 
 boost types
 --------------
 optional
+variant
 
 
 helpers subdir
