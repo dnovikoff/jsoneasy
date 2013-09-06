@@ -6,6 +6,7 @@
 #include <list>
 #include <stack>
 #include <deque>
+#include <tuple>
 
 #include <boost/optional.hpp>
 
@@ -370,6 +371,35 @@ BOOST_AUTO_TEST_CASE( complexPairTest ) {
 		BOOST_CHECK( !parseTo("[[],[]]", x) );
 		BOOST_CHECK( parseTo("[[\"hi\",null],[1,[]]]", x) );
 	}
+}
+
+BOOST_AUTO_TEST_CASE( tupleTest ) {
+	{
+		std::tuple<int> x;
+		BOOST_REQUIRE( parseTo("[6]", x) );
+		BOOST_CHECK_EQUAL( std::get<0>(x), 6 );
+
+		BOOST_CHECK( !parseTo("[]", x) );
+		BOOST_CHECK( !parseTo("[6,7]", x) );
+	}
+	{
+		std::tuple<int, bool, std::string, double> x;
+		BOOST_REQUIRE( parseTo("[6,false,\"hi\",0.25]", x) );
+		BOOST_CHECK_EQUAL( std::get<0>(x), 6 );
+		BOOST_CHECK_EQUAL( std::get<1>(x), false );
+		BOOST_CHECK_EQUAL( std::get<2>(x), "hi" );
+		BOOST_CHECK_EQUAL( std::get<3>(x), 0.25 );
+	}
+	{
+		std::tuple<std::pair<int,int>, bool, std::vector<std::string>, double> x;
+		BOOST_REQUIRE( parseTo("[[6,7],false,[],0.25]", x) );
+		BOOST_CHECK_EQUAL( std::get<0>(x).first, 6 );
+		BOOST_CHECK_EQUAL( std::get<0>(x).second, 7 );
+		BOOST_CHECK_EQUAL( std::get<1>(x), false );
+		BOOST_CHECK( std::get<2>(x).empty() );
+		BOOST_CHECK_EQUAL( std::get<3>(x), 0.25 );
+	}
+
 }
 
 // class type key test

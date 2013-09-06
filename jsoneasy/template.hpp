@@ -14,6 +14,7 @@
 #include <jsoneasy/template/support/set.hpp>
 #include <jsoneasy/template/support/stack.hpp>
 #include <jsoneasy/template/support/pair.hpp>
+#include <jsoneasy/template/support/tuple.hpp>
 
 // objects
 #include <jsoneasy/template/support/map.hpp>
