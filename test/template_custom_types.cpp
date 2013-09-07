@@ -104,7 +104,7 @@ namespace Template {
 
 /**
  * Custom converter for our class
- * This will acept only string as input
+ * This will accept only string as input
  */
 template<size_t MaxChars>
 struct Type<std::string, StringClass<MaxChars> >{
