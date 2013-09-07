@@ -2,6 +2,7 @@
 #define JSONEASY_TEMPLATE_DETAILS_SUB_HANDLER_HPP_
 
 #include <jsoneasy/parser/handler.hpp>
+#include <jsoneasy/template/container.hpp>
 
 namespace JsonEasy {
 namespace Template {

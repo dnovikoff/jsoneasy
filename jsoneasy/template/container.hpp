@@ -1,13 +1,6 @@
 #ifndef JSONEASY_TEMPLATE_INSERT_HPP_
 #define JSONEASY_TEMPLATE_INSERT_HPP_
 
-#include <string>
-
-#include <boost/utility/enable_if.hpp>
-
-#include <jsoneasy/template/type.hpp>
-#include <jsoneasy/parser/handler.hpp>
-
 namespace JsonEasy {
 namespace Template {
 

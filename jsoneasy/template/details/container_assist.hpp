@@ -2,9 +2,9 @@
 #define JSONEASY_TEMPLATE_DETAILS_CONTAINER_ASSIST_HPP_
 
 #include <string>
-#include <boost/utility/enable_if.hpp>
 
 #include <jsoneasy/template/key.hpp>
+#include <jsoneasy/template/type.hpp>
 
 namespace JsonEasy {
 namespace Template {

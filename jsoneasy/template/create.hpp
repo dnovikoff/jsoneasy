@@ -3,6 +3,7 @@
 
 #include <jsoneasy/parser/handler.hpp>
 #include <jsoneasy/template/container.hpp>
+#include <jsoneasy/template/type.hpp>
 #include <jsoneasy/template/details/start_handler.hpp>
 
 namespace JsonEasy {

@@ -1,1 +1,5 @@
+project
+    : requirements <cflags>"-ftemplate-depth-300"
+;
+
 lib parser : [ glob *.cpp ] : <link>static ;
