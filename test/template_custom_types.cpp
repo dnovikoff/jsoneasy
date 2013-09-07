@@ -121,13 +121,13 @@ struct Type<std::string, StringClass<MaxChars> >{
 BOOST_AUTO_TEST_CASE ( stringClassTest ) {
 	OneArray<StringClass<3> > x;
 	BOOST_CHECK( parseTo(R"([""])", x) );
-	BOOST_CHECK_EQUAL( x->value, "");
+	BOOST_CHECK_EQUAL( *x, "");
 
 	BOOST_CHECK( parseTo(R"(["a"])", x) );
-	BOOST_CHECK_EQUAL( x->value, "a");
+	BOOST_CHECK_EQUAL( *x, "a");
 
 	BOOST_CHECK( parseTo(R"(["abc"])", x) );
-	BOOST_CHECK_EQUAL( x->value, "abc");
+	BOOST_CHECK_EQUAL( *x, "abc");
 
 	// More then 3 chars
 	BOOST_CHECK( !parseTo(R"(["abcd"])", x) );

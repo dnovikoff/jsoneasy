@@ -254,14 +254,14 @@ BOOST_AUTO_TEST_CASE ( stringSimpleEscapingTest ) {
 	BOOST_REQUIRE( parseTo("[\"Hello\"]", x) );
 	BOOST_CHECK_EQUAL( x.back(), "Hello");
 
-	BOOST_REQUIRE( parseTo("[\"Hello\\\"World\"]", x) );
-	BOOST_CHECK_EQUAL( x.back(), "Hello\"World");
+	BOOST_REQUIRE( parseTo(R"(["Hello\"World"])", x) );
+	BOOST_CHECK_EQUAL( x.back(), R"(Hello"World)");
 
-	BOOST_REQUIRE( parseTo("[\"Hello\\\\\\\"World\"]", x) );
-	BOOST_CHECK_EQUAL( x.back(), "Hello\\\"World");
+	BOOST_REQUIRE( parseTo(R"(["Hello\\\"World"])", x) );
+	BOOST_CHECK_EQUAL( x.back(), R"(Hello\"World)");
 
-	BOOST_REQUIRE( parseTo("[\"Hello\\\\\"]", x) );
-	BOOST_CHECK_EQUAL( x.back(), "Hello\\");
+	BOOST_REQUIRE( parseTo(R"(["Hello\\"])", x) );
+	BOOST_CHECK_EQUAL( x.back(), R"(Hello\)");
 
 	BOOST_REQUIRE( parseTo("[\"Hello\\t\\n\\t\"]", x) );
 	BOOST_CHECK_EQUAL( x.back(), "Hello\t\n\t");
@@ -282,13 +282,13 @@ BOOST_AUTO_TEST_CASE ( complexContainerTest ) {
 	BOOST_CHECK( x.size() == 1u);
 	BOOST_CHECK( x.back().empty() );
 
-	BOOST_REQUIRE( parseTo("[{\"hello\":[]}]", x) );
+	BOOST_REQUIRE( parseTo(R"([{"hello":[]}])", x) );
 	BOOST_REQUIRE(x.size() == 1u);
 	BOOST_REQUIRE(x.back().size() == 1u);
 	BOOST_REQUIRE(x.back().begin()->first == "hello");
 	BOOST_REQUIRE(x.back().begin()->second.empty());
 
-	BOOST_REQUIRE( parseTo("[{\"hello\":[4,2,3]}]", x) );
+	BOOST_REQUIRE( parseTo(R"([{"hello":[4,2,3]}])", x) );
 
 	BOOST_REQUIRE(x.size() == 1u);
 	BOOST_REQUIRE(x.back().size() == 1u);
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE ( complexContainerTest ) {
 BOOST_AUTO_TEST_CASE ( mapWitCustomKey ) {
 	std::map<int, int> x;
 	BOOST_CHECK( parseTo("{}", x) );
-	BOOST_REQUIRE( parseTo("{\"6\": 4,\"0\": 18}", x) );
+	BOOST_REQUIRE( parseTo(R"({"6": 4,"0": 18})", x) );
 	BOOST_REQUIRE_EQUAL( x.size(), 2u );
 	BOOST_CHECK_EQUAL( x.at(6), 4);
 	BOOST_CHECK_EQUAL( x.at(0), 18);
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE( complexPairTest ) {
 		typedef std::pair<t1, t2> t3;
 		t3 x;
 		BOOST_CHECK( !parseTo("[[],[]]", x) );
-		BOOST_CHECK( parseTo("[[\"hi\",null],[1,[]]]", x) );
+		BOOST_CHECK( parseTo(R"([["hi",null],[1,[]]])", x) );
 	}
 }
 
@@ -373,7 +373,7 @@ BOOST_AUTO_TEST_CASE( tupleTest ) {
 	}
 	{
 		std::tuple<int, bool, std::string, double> x;
-		BOOST_REQUIRE( parseTo("[6,false,\"hi\",0.25]", x) );
+		BOOST_REQUIRE( parseTo(R"([6,false,"hi",0.25])", x) );
 		BOOST_CHECK_EQUAL( std::get<0>(x), 6 );
 		BOOST_CHECK_EQUAL( std::get<1>(x), false );
 		BOOST_CHECK_EQUAL( std::get<2>(x), "hi" );
@@ -475,7 +475,7 @@ BOOST_AUTO_TEST_CASE( variantContainerTest ) {
 		BOOST_REQUIRE( v.empty() );
 	}
 	{
-		BOOST_REQUIRE( parseTo("{\"hello\":\"world\"}", x ) );
+		BOOST_REQUIRE( parseTo(R"({"hello":"world"})", x ) );
 		const auto& v = boost::get<map_t>(x);
 		BOOST_REQUIRE_EQUAL( v.size(), 1u );
 		BOOST_REQUIRE_EQUAL( v.at("hello"), "world" );
