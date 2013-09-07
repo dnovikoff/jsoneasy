@@ -6,6 +6,7 @@ alias parser : ..//jsoneasy/parser/<link>static ;
 alias fortest : parser ut ;
 
 unit-test template_test : template.cpp fortest ;
+unit-test template_custom_types_test : template_custom_types.cpp fortest ;
 unit-test parse_test : parse.cpp fortest ;
 
 #: <testing.launcher>gdb

@@ -2,14 +2,7 @@
 #define BOOST_TEST_MAIN
 
 #include <iostream>
-#include <vector>
-#include <list>
-#include <stack>
-#include <deque>
-#include <tuple>
 
-#include <boost/optional.hpp>
-#include <boost/variant.hpp>
 #include <boost/variant/get.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -57,11 +50,9 @@ static bool cequals(const R1& x1, const R2& x2) {
 
 template<typename T>
 static bool parseTo(const std::string& input, T& data) {
-	T tmp;
-	JsonEasy::Parser::Handler::Ptr h = JsonEasy::Template::createHandler(tmp);
+	JsonEasy::Parser::Handler::Ptr h = JsonEasy::Template::createHandler(data);
 	JsonEasy::Parser::StringParser sp;
 	if( !sp.parse(input, h) ) return false;
-	boost::swap(tmp, data);
 	return true;
 }
 
