@@ -23,7 +23,6 @@ struct Type<JsonType, boost::optional<T> >{
 template<JsonContainerType RequestedType, typename T>
 class Container<RequestedType, boost::optional<T> >: public Container<RequestedType, T> {};
 
-
 } // namespace Template
 } // namespace JsonEasy
 

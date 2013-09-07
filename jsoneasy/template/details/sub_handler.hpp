@@ -10,16 +10,6 @@ namespace Details  {
 
 template<JsonContainerType JsonType, typename ValueType, typename ParentT> class Handler;
 
-template<typename T>
-struct IsNotContainerTag {
-	static const bool value = false;
-};
-
-template<>
-struct IsNotContainerTag<NotContainerTag> {
-	static const bool value = true;
-};
-
 template<JsonContainerType RequestedType, typename T>
 struct GetContainerType {
 	typedef typename Container<RequestedType,T>::ValueType ValueType;

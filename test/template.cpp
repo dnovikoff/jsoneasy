@@ -450,17 +450,58 @@ BOOST_AUTO_TEST_CASE( tupleVariantTest ) {
 	BOOST_CHECK_EQUAL( boost::get<int>( std::get<0>(x) ), 7 );
 }
 
-// variant parsing custom types with runtime fail
+template<typename T>
+T& getFirst(std::tuple<T>& x) {
+	return std::get<0>(x);
+}
 
-// tuple<variant>
+BOOST_AUTO_TEST_CASE( optinalContainer ) {
+	std::tuple<boost::optional<std::vector<int> > > x;
+	BOOST_REQUIRE( parseTo("[null]", x ) );
+	BOOST_CHECK( !getFirst(x).is_initialized() );
+
+	BOOST_REQUIRE( parseTo("[[]]", x ) );
+	BOOST_REQUIRE( getFirst(x).is_initialized() );
+	BOOST_REQUIRE( getFirst(x)->empty() );
+}
+
+BOOST_AUTO_TEST_CASE( variantContainerTest ) {
+	typedef std::vector<int> vec_t;
+	typedef std::map<std::string, std::string> map_t;
+	boost::variant<vec_t,map_t> x;
+	{
+		BOOST_REQUIRE( parseTo("[7]", x ) );
+		const auto& v = boost::get<vec_t>(x);
+		BOOST_REQUIRE_EQUAL( v.size(), 1u);
+		BOOST_CHECK_EQUAL( v.back(), 7);
+	}
+	{
+		BOOST_REQUIRE( parseTo("[7,6]", x ) );
+		const vec_t& v = boost::get<vec_t>(x);
+		BOOST_REQUIRE_EQUAL( v.size(), 2u);
+		BOOST_CHECK_EQUAL( v.back(), 6);
+		BOOST_CHECK_EQUAL( v.front(), 7);
+	}
+	{
+		BOOST_REQUIRE( parseTo("{}", x ) );
+		const auto& v = boost::get<map_t>(x);
+		BOOST_REQUIRE( v.empty() );
+	}
+	{
+		BOOST_REQUIRE( parseTo("{\"hello\":\"world\"}", x ) );
+		const auto& v = boost::get<map_t>(x);
+		BOOST_REQUIRE_EQUAL( v.size(), 1u );
+		BOOST_REQUIRE_EQUAL( v.at("hello"), "world" );
+	}
+}
+
+// variant parsing custom types with runtime fail
 
 // class type key test
 // class type container test
 // class type value test
 
-// support for pair and tuple
 // utf symbols tests
-// multitype (object+array)
 // int64
 // uint
 // char

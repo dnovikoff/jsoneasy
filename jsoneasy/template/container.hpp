@@ -9,6 +9,16 @@ enum JsonContainerType { NotContainer, JsonObject, JsonArray };
 
 struct NotContainerTag {};
 
+template<typename T>
+struct IsNotContainerTag {
+	static const bool value = false;
+};
+
+template<>
+struct IsNotContainerTag<NotContainerTag> {
+	static const bool value = true;
+};
+
 // Use as value type in case container could consist of different types (object, pair, tuple)
 struct AnyType {};
 
