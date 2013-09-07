@@ -482,11 +482,7 @@ BOOST_AUTO_TEST_CASE( variantContainerTest ) {
 	}
 }
 
-// variant parsing custom types with runtime fail
-
 // class type key test
-// class type container test
-// class type value test
 
 // utf symbols tests
 // int64

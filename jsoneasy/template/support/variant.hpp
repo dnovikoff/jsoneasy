@@ -2,6 +2,7 @@
 #define JSONEASY_TEMPLATE_VARIANT_HPP_
 
 #include <boost/variant.hpp>
+
 #include <boost/mpl/if.hpp>
 
 #include <jsoneasy/template/container.hpp>

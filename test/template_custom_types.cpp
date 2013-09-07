@@ -5,9 +5,10 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/typeof/typeof.hpp>
+#include <boost/variant/get.hpp>
 
 #include <jsoneasy/parser/string_parser.hpp>
-#include <jsoneasy/template.hpp>
+#include <jsoneasy/template/create.hpp>
 
 template<typename T>
 static bool parseTo(const std::string& input, T& data) {
@@ -134,6 +135,7 @@ BOOST_AUTO_TEST_CASE ( stringClassTest ) {
 }
 
 #include <jsoneasy/template/support/variant.hpp>
+
 /**
  * Variant could try to apply value to several types if failed in runtimer
  */
@@ -192,3 +194,48 @@ BOOST_AUTO_TEST_CASE ( variantRuntimeSelectTest2 ) {
 	BOOST_CHECK( parseTo(R"(["1234567890"])", x) );
 	BOOST_CHECK_EQUAL( x.get<std::string>(), "1234567890");
 }
+
+struct CustomKey {
+	size_t value;
+
+	// with implicit conversion from size_t
+	CustomKey(size_t v):value(v) {}
+	CustomKey():value(0) {}
+
+	// Should be comparable to be stored in map
+	bool operator<(const CustomKey& other) const {
+		return value < other.value;
+	}
+};
+
+namespace JsonEasy {
+namespace Template {
+
+// This key will convert string to its size. Just to show abilities
+template<>
+struct Key<CustomKey> {
+	static bool convert(std::string& parsed, CustomKey& user) {
+		user.value = parsed.size();
+		return true;
+	}
+};
+
+} // namespace Template
+} // namespace JsonEasy
+
+#include <jsoneasy/template/support/map.hpp>
+
+// If variant values will be lested in reverse order - this will not work
+BOOST_AUTO_TEST_CASE ( customKeyTest ) {
+	std::map<CustomKey, int> x;
+	BOOST_CHECK( parseTo(R"({})", x) );
+	BOOST_REQUIRE( x.empty() );
+	BOOST_CHECK( parseTo(R"({"":894, "abc":0, "01234567890": 11222 })", x) );
+	BOOST_REQUIRE_EQUAL( x.size(), 3u);
+	BOOST_CHECK_EQUAL( x.at(0u), 894);
+	BOOST_CHECK_EQUAL( x.at(3u), 0);
+	BOOST_CHECK_EQUAL( x.at(11u), 11222);
+}
+
+// check that movable, non-copyable types parsers compiles
+// add set of compilation tests
