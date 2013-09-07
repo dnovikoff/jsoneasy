@@ -1,9 +1,5 @@
 #include <jsoneasy/template/support/helpers/list_like.hpp>
 
-namespace std {
-template<typename T, typename A> class list;
-} // namespace std
-
 #define JSONEASY_TMP1 std::JSONEASY_TEMPLATE_CONTAINER_NAME<T,A>
 
 namespace JsonEasy {

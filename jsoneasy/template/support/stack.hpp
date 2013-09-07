@@ -1,9 +1,7 @@
 #ifndef JSONEASY_TEMPLATE_STACK_HPP_
 #define JSONEASY_TEMPLATE_STACK_HPP_
 
-namespace std {
-template<typename T, typename D> class stack;
-} // namespace std
+#include <stack>
 
 #include <jsoneasy/template/container.hpp>
 

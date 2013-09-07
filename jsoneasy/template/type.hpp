@@ -1,6 +1,8 @@
 #ifndef JSONEASY_TEMPLATE_TYPE_HPP_
 #define JSONEASY_TEMPLATE_TYPE_HPP_
 
+#include <type_traits>
+
 namespace JsonEasy {
 namespace Template {
 
@@ -16,13 +18,21 @@ struct IsNullTag<NullTag> {
 	static const bool value = true;
 };
 
+struct NotConvertableTag {};
+
 /**
  * Describes how User Types converts with Simple types
  * Not allowed to convert by default
  */
 template<typename JsonType, typename UserType>
-struct Type {
+struct Type: public NotConvertableTag {
 	static bool jsonToUser(JsonType&, UserType&) { return false; }
+};
+
+
+template<typename JsonType, typename UserType>
+struct TypeConvertable {
+	const static bool value = !std::is_base_of<NotConvertableTag, UserType>::value;
 };
 
 /**

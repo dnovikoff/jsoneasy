@@ -9,6 +9,8 @@
 #include <tuple>
 
 #include <boost/optional.hpp>
+#include <boost/variant.hpp>
+#include <boost/variant/get.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/typeof/typeof.hpp>
@@ -401,6 +403,56 @@ BOOST_AUTO_TEST_CASE( tupleTest ) {
 	}
 
 }
+
+template<typename T, typename Y>
+const T& getOne(const std::vector<Y>& x) {
+	assert( x.size() == 1u);
+	return boost::get<T>( x.back() );
+}
+
+BOOST_AUTO_TEST_CASE( doubleAsIntTest ) {
+	std::vector<int> x;
+	BOOST_REQUIRE( parseTo("[6]", x ) );
+	BOOST_REQUIRE_EQUAL( x.size(), 1u);
+	BOOST_REQUIRE_EQUAL( x.back(), 6);
+	BOOST_REQUIRE( !parseTo("[6.5]", x ) );
+}
+
+BOOST_AUTO_TEST_CASE( variantTest ) {
+	{
+		std::vector<boost::variant<int> > x;
+		BOOST_REQUIRE( parseTo("[6]", x ) );
+		BOOST_CHECK_EQUAL(getOne<int>(x), 6);
+	}
+	{
+		// will try int first
+		std::vector<boost::variant<int, double> > x;
+		BOOST_REQUIRE( parseTo("[4]", x ) );
+		BOOST_CHECK_EQUAL(getOne<int>(x), 4);
+
+		BOOST_REQUIRE( parseTo("[6.5]", x ) );
+		BOOST_CHECK_EQUAL(getOne<double>(x), 6.5);
+	}
+	{
+		// will try double first. Will be always double for this reason
+		std::vector<boost::variant<double, int> > x;
+		BOOST_REQUIRE( parseTo("[6]", x ) );
+		BOOST_CHECK_EQUAL(getOne<double>(x), 6);
+
+		BOOST_REQUIRE( parseTo("[6.5]", x ) );
+		BOOST_CHECK_EQUAL(getOne<double>(x), 6.5);
+	}
+}
+
+BOOST_AUTO_TEST_CASE( tupleVariantTest ) {
+	std::tuple<boost::variant<int, double, std::string> > x;
+	BOOST_REQUIRE( parseTo("[7]", x ) );
+	BOOST_CHECK_EQUAL( boost::get<int>( std::get<0>(x) ), 7 );
+}
+
+// variant parsing custom types with runtime fail
+
+// tuple<variant>
 
 // class type key test
 // class type container test

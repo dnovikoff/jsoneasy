@@ -1,5 +1,5 @@
-#ifndef JSONEASY_TEMPLATE_SET_HPP_
-#define JSONEASY_TEMPLATE_SET_HPP_
+#ifndef JSONEASY_TEMPLATE_MUlTISET_HPP_
+#define JSONEASY_TEMPLATE_MUlTISET_HPP_
 
 #include <set>
 
@@ -9,14 +9,15 @@ namespace JsonEasy {
 namespace Template {
 
 template<typename T, typename C, typename A>
-class Container<JsonArray, std::set<T,C,A > > {
-	typedef std::set<T,C,A> SetType;
+class Container<JsonArray, std::multiset<T,C,A > > {
+	typedef std::multiset<T,C,A> SetType;
 public:
 	SetType data;
 	typedef T ValueType;
 
 	bool insert(ValueType& x) {
-		return data.insert( std::move(x) ).second;
+		data.insert( std::move(x) );
+		return true;
 	}
 
 	bool validate() { return true; }

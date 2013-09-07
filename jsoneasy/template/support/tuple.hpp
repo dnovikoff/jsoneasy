@@ -1,9 +1,7 @@
 #ifndef JSONEASY_TEMPLATE_TUPLE_HPP_
 #define JSONEASY_TEMPLATE_TUPLE_HPP_
 
-namespace std {
-template<class... Types> class tuple;
-} // namespace std
+#include <tuple>
 
 #include <jsoneasy/template/container.hpp>
 #include <jsoneasy/template/visitors.hpp>

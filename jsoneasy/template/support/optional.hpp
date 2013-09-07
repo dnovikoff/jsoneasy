@@ -1,9 +1,7 @@
 #ifndef JSONEASY_TEMPLATE_OPTIONAL_HPP_
 #define JSONEASY_TEMPLATE_OPTIONAL_HPP_
 
-namespace boost {
-template<typename T> class optional;
-} // namespace boost
+#include <boost/optional.hpp>
 
 #include <jsoneasy/template/type.hpp>
 

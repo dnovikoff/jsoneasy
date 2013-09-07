@@ -1,5 +1,5 @@
-#ifndef JSONEASY_TEMPLATE_MAP_HPP_
-#define JSONEASY_TEMPLATE_MAP_HPP_
+#ifndef JSONEASY_TEMPLATE_MULTIMAP_HPP_
+#define JSONEASY_TEMPLATE_MULTIMAP_HPP_
 
 #include <map>
 
@@ -9,8 +9,8 @@ namespace JsonEasy {
 namespace Template {
 
 template<typename K,typename V, typename C, typename A>
-class Container<JsonObject, std::map<K,V,C,A> > {
-	typedef std::map<K,V,C,A> MapType;
+class Container<JsonObject, std::multimap<K,V,C,A> > {
+	typedef std::multimap<K,V,C,A> MapType;
 public:
 	MapType data;
 	typedef V ValueType;
@@ -18,7 +18,8 @@ public:
 
 	bool insert(KeyType& key, ValueType& val) {
 		auto p = std::make_pair(std::move(key), std::move(val));
-		return data.insert(std::move(p)).second;
+		data.insert(std::move(p)).second;
+		return true;
 	}
 
 	bool validate() { return true; }
@@ -27,4 +28,4 @@ public:
 } // namespace Template
 } // namespace JsonEasy
 
-#endif /* JSONEASY_TEMPLATE_MAP_HPP_ */
+#endif /* JSONEASY_TEMPLATE_MULTIMAP_HPP_ */

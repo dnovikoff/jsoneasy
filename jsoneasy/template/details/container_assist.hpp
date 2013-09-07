@@ -16,12 +16,16 @@ class SelectInsert {
 public:
 	template<typename ContainerT>
 	static bool insert(ContainerT& c, T& v) {
+		// for optimizator
+		if( !TypeConvertable<T,ValueType>::value ) return false;
 		ValueType tmp;
 		if( !jsonToUser(v, tmp) ) return false;
 		return c.insert(tmp);
 	}
 	template<typename ContainerT, typename KeyType>
 	static bool insert(ContainerT& c, KeyType& k, T& v) {
+		// for optimizator
+		if( !TypeConvertable<T,ValueType>::value ) return false;
 		ValueType tmp;
 		if( !jsonToUser(v, tmp) ) return false;
 		return c.insert(k, tmp);

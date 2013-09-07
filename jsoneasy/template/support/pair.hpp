@@ -1,9 +1,7 @@
 #ifndef JSONEASY_TEMPLATE_PAIR_HPP_
 #define JSONEASY_TEMPLATE_PAIR_HPP_
 
-namespace std {
-template<typename T1, typename T2> struct pair;
-} // namespace std
+#include <utility>
 
 #include <jsoneasy/template/container.hpp>
 
