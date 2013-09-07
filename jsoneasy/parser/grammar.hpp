@@ -11,7 +11,6 @@
 #include <boost/spirit/include/phoenix_stl.hpp>
 
 #include <jsoneasy/parser/handler.hpp>
-#include <jsoneasy/parser/exception.hpp>
 
 namespace JsonEasy {
 namespace Parser   {
@@ -39,6 +38,9 @@ struct qchar_ : qi::symbols<char, char> {
 template <typename Iterator>
 class Grammar : public qi::grammar<Iterator> {
 	typedef Grammar<Iterator> self_t;
+	// It is said in doucmentation, that maximum allowed level is 20
+	static const size_t maximumDepthAllowed = 20;
+	static const size_t handlersLimit = maximumDepthAllowed;
 
 	qi::rule<Iterator, std::string()> qstring;
 	boost::spirit::qi::uint_parser<unsigned, 16, 4, 4> myhex;
@@ -60,75 +62,62 @@ class Grammar : public qi::grammar<Iterator> {
 
 	Handler& currentHandler() const { return *handlers.top(); }
 
+	// helper funciton
 	template<typename T>
-	void unexpectedException(const char * x, const T& val) {
-		throw UnexpectedException(x, val);
+	bool p(T& x) {
+		return currentHandler()( x );
 	}
 
-	void unexpectedException(const char * x, const std::string& val) {
-		throw UnexpectedException(x, val.size()); // Avoid output corruption. Just size
+	bool intParsed(int x) {
+		return p( x );
 	}
-
-	void unexpectedException(const char * x) {
-		throw UnexpectedException(x);
+	bool boolParsed(bool x) {
+		return p( x );
 	}
-
-	void intParsed(const int x) {
-		if(!currentHandler()( x )) {
-			unexpectedException("int", x);
-		}
-	}
-	void boolParsed(const bool x) {
-		if(!currentHandler()( x )) {
-			unexpectedException("bool", x);
-		}
-	}
-	void doubleParsed(double x) {
-		if(!currentHandler()( x )) {
-			unexpectedException("double", x);
-		}
+	bool doubleParsed(double x) {
+		return p( x );
 	}
 	// Hack for leading zeros
-	void zeroParsed() {
-		intParsed(0);
+	bool zeroParsed() {
+		return intParsed(0);
 	}
-	void nullParsed() {
-		if(!currentHandler().null()) {
-			unexpectedException("null");
-		}
+	bool nullParsed() {
+		return currentHandler().null();
 	}
-	void stringParsed(std::string& x) {
-		if(!currentHandler()( x )) {
-			unexpectedException("string", x);
-		}
+	bool stringParsed(std::string& x) {
+		return p( x );
 	}
-	void keyParsed(std::string& x) {
-		if(!currentHandler().key( x )) {
-			unexpectedException("key", x);
-		}
+	bool keyParsed(std::string& x) {
+		return currentHandler().key( x );
 	}
 	void pushHandler(Handler::Ptr& x) {
 		handlers.push( std::move(x) );
 	}
-	void newObject() {
-		auto x = currentHandler().object();
-		if(!x) {
-			unexpectedException("object");
-		}
-		pushHandler( x );
+	bool oneMoreHandlerAllowed() {
+		return handlers.size() < handlersLimit;
 	}
-	void newArray() {
-		auto x = currentHandler().array();
-		if(!x) {
-			unexpectedException("array");
+	bool newObject() {
+		if(!oneMoreHandlerAllowed()) return false;
+		if(auto x = currentHandler().object()) {
+			pushHandler( x );
+			return true;
 		}
-		pushHandler( x );
+		return false;
 	}
-	void onParsed() {
+	bool newArray() {
+		if(!oneMoreHandlerAllowed()) return false;
+		if(auto x = currentHandler().array()) {
+			pushHandler( x );
+			return true;
+		}
+		return false;
+	}
+	bool onParsed() {
 		if( !currentHandler().onParsed() ) {
-			unexpectedException("content");
+			return false;
 		}
 		handlers.pop();
+		return true;
 	}
 public:
 	/**
@@ -161,13 +150,14 @@ public:
 		using qi::int_;
 		using qi::char_;
 		using qi::bool_;
+		using qi::_pass;
 
-#define BIND(X) boost::phoenix::bind(&self_t::X, this)
-#define BIND1(X) boost::phoenix::bind(&self_t::X, this, boost::spirit::_1)
+#define BIND(X) _pass = boost::phoenix::bind(&self_t::X, this)
+#define BIND1(X) _pass = boost::phoenix::bind(&self_t::X, this, boost::spirit::_1)
 		array = char_('[') [ BIND(newArray) ] >> skipper >> -(value % ',') >> char_(']') [ BIND(onParsed) ];
 
 		pair = skipper >> qstring [ BIND1(keyParsed) ] >> skipper >> char_(':') >> value ;
-		map = char_('{') [ BIND(newObject) ] >> skipper >> -(pair % ',') >> char_('}') [ BIND(onParsed) ];
+		map = char_('{') [ _pass = BIND(newObject) ] >> skipper >> -(pair % ',') >> char_('}') [ BIND(onParsed) ];
 		value = skipper >> (
 				(lit("null")[ BIND(nullParsed) ]) |
 				qstring [ BIND1(stringParsed) ] |

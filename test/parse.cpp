@@ -5,7 +5,6 @@
 #include <boost/typeof/typeof.hpp>
 
 #include <jsoneasy/parser/string_parser.hpp>
-#include <jsoneasy/parser/exception.hpp>
 #include <jsoneasy/parser/handler.hpp>
 
 /**
@@ -13,7 +12,6 @@
  */
 class MyParser: public JsonEasy::Parser::Handler {
 	const size_t depth;
-	static const size_t MAX_DEPTH = 20;
 	std::ostringstream tmpstream;
 public:
 	std::ostream& shift() {
@@ -47,17 +45,11 @@ public:
 		return true;
 	}
 
-	bool isTooDeepForNext() const{
-		return ( depth+1 >= MAX_DEPTH );
-	}
-
 	Ptr object() override {
-		if(isTooDeepForNext()) return Ptr();
 		shift() << "object{" << std::endl;
 		return Ptr(new MyParser(depth+1));
 	}
 	Ptr array() override {
-		if(isTooDeepForNext()) return Ptr();
 		shift() << "array[" << std::endl;
 		return Ptr(new MyParser(depth+1));
 	}
@@ -73,10 +65,7 @@ class MyStringParser: public JsonEasy::Parser::StringParser {
 public:
 	bool operator()(const std::string& input) {
 		JsonEasy::Parser::Handler::Ptr h(new MyParser);
-		try {
-			return parse(input, h);
-		} catch(const JsonEasy::Parser::UnexpectedException&) {}
-		return false;
+		return parse(input, h);
 	}
 };
 

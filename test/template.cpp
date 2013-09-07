@@ -16,7 +16,6 @@
 #include <boost/typeof/typeof.hpp>
 
 #include <jsoneasy/parser/string_parser.hpp>
-#include <jsoneasy/parser/exception.hpp>
 #include <jsoneasy/template.hpp>
 
 #include <boost/assign.hpp>
@@ -59,14 +58,11 @@ static bool cequals(const R1& x1, const R2& x2) {
 template<typename T>
 static bool parseTo(const std::string& input, T& data) {
 	T tmp;
-	try {
-		JsonEasy::Parser::Handler::Ptr h = JsonEasy::Template::createHandler(tmp);
-		JsonEasy::Parser::StringParser sp;
-		if( !sp.parse(input, h) ) return false;
-		boost::swap(tmp, data);
-		return true;
-	} catch(const JsonEasy::Parser::UnexpectedException&) {}
-	return false;
+	JsonEasy::Parser::Handler::Ptr h = JsonEasy::Template::createHandler(tmp);
+	JsonEasy::Parser::StringParser sp;
+	if( !sp.parse(input, h) ) return false;
+	boost::swap(tmp, data);
+	return true;
 }
 
 BOOST_AUTO_TEST_CASE ( vectorTest ) {
