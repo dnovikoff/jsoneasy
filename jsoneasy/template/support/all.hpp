@@ -23,5 +23,8 @@
 #include <jsoneasy/template/support/optional.hpp>
 #include <jsoneasy/template/support/variant.hpp>
 
+// Special default behaviour for key-casting
+#include <jsoneasy/template/support/key_lexical_cast.hpp>
+
 
 #endif /* JSONEASY_TEMPLATE_ALL_HPP_ */

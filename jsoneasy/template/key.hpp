@@ -2,10 +2,21 @@
 #define JSONEASY_TEMPLATE_KEY_HPP_
 
 #include <string>
-#include <boost/lexical_cast.hpp>
 
 namespace JsonEasy {
 namespace Template {
+
+/**
+ * Hack to include your own implementation for default convert
+ * We will use lexical_cast
+ * See support/key_lexical_cast.hpp as an example
+ */
+template<bool enabled, typename UserType>
+struct DefaultKey {
+	static bool convert(std::string&, UserType&) {
+		return false;
+	}
+};
 
 /**
  * This class describes how string key could be converted to other types
@@ -16,12 +27,7 @@ namespace Template {
 template<typename UserType>
 struct Key {
 	static bool convert(std::string& parsed, UserType& user) {
-		try {
-			user = std::move(boost::lexical_cast<UserType>(parsed));
-		} catch(const boost::bad_lexical_cast&) {
-			return false;
-		}
-		return true;
+		return DefaultKey<true, UserType>::convert(parsed, user);
 	}
 };
 
