@@ -3,7 +3,7 @@
 project jsoneasy
 	: build-dir .build
 	: requirements
-		<cflags>"-std=c++11"
+		<cflags>"-std=c++11 -Wextra"
 		<warnings-as-errors>on
 		<warnings>all
 		<debug-symbols>off
