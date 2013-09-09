@@ -2,4 +2,6 @@ project
     : requirements <cflags>"-ftemplate-depth-300"
 ;
 
-lib parser : [ glob *.cpp ] : <link>static ;
+cpp-pch grammar : grammar.hpp ;
+
+lib parser : grammar [ glob *.cpp ] : <link>static ;
