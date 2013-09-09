@@ -1,18 +1,19 @@
-project
-    : requirements <cflags>"-Werror -Wall -Wextra -Wno-long-long -Wno-non-virtual-dtor -std=c++11 -pedantic -pedantic-errors"
-    : requirements <variant>release
-    : requirements <optimization>speed
-    : requirements <inlining>full
-    : requirements <include>.
-    : build-dir .build
+#    : requirements <cflags>"-Werror -Wall -Wextra -Wno-long-long -Wno-non-virtual-dtor -std=c++11 -pedantic -pedantic-errors"
+
+project jsoneasy
+	: build-dir .build
+	: requirements
+		<cflags>"-std=c++11"
+		<warnings-as-errors>on
+		<warnings>all
+		<debug-symbols>off
+		<variant>release
+		<optimization>speed
+		<inlining>full
+		<include>.
+	: build-dir .build
 ;
 
 build-project jsoneasy ;
 
 build-project test ;
-
-#alias test1 : test//test1 ;
-#alias test2 : test//test2 ;
-#alias test4 : test//test4 ;
-
-
