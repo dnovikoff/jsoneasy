@@ -4,7 +4,8 @@
 #include <string>
 
 #include <jsoneasy/template/key.hpp>
-#include <jsoneasy/template/type.hpp>
+#include <jsoneasy/template/convert.hpp>
+#include <jsoneasy/template/details/assert.hpp>
 
 namespace JsonEasy {
 namespace Template {
@@ -16,6 +17,7 @@ class SelectInsert {
 public:
 	template<typename ContainerT>
 	static bool insert(ContainerT& c, T& v) {
+		typedef typename Details::ConvertableFromOneOfJson<typename ExtractContainerType<ContainerT>::type> StaticAssert;
 		// for optimizator
 		if( !TypeConvertable<T,ValueType>::value ) return false;
 		ValueType tmp;
@@ -24,6 +26,7 @@ public:
 	}
 	template<typename ContainerT, typename KeyType>
 	static bool insert(ContainerT& c, KeyType& k, T& v) {
+		typedef typename Details::ConvertableFromOneOfJson<typename ExtractContainerType<ContainerT>::type> StaticAssert;
 		// for optimizator
 		if( !TypeConvertable<T,ValueType>::value ) return false;
 		ValueType tmp;
@@ -32,8 +35,8 @@ public:
 	}
 };
 
-template<typename T>
-class SelectInsert<T, AnyType> {
+template<typename T, typename... PossibleTypes>
+class SelectInsert<T, AnyType<PossibleTypes...> > {
 public:
 	template<typename ContainerT>
 	static bool insert(ContainerT& c, T& v) {

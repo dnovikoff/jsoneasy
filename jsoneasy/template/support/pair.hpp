@@ -17,7 +17,7 @@ public:
 
 	PairType data;
 	// Note for special value type
-	typedef AnyType ValueType;
+	typedef AnyType<T1,T2> ValueType;
 
 	// Due to AnyType we can use template parameter as argument
 	// but we also need to take care of correct conversion

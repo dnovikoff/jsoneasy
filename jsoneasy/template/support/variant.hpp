@@ -66,24 +66,8 @@ struct Type<JsonType, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> >{
 	}
 };
 
-// Suupport for containers
-
-template<bool enabled, JsonContainerType RequestedType, typename... OtherTypes>
-struct VaraintFirstContainerType {
-	typedef Container<RequestedType, NotContainerTag> type;
-};
-
-template<JsonContainerType RequestedType, typename FirstType, typename... OtherTypes>
-struct VaraintFirstContainerType<true, RequestedType, FirstType, OtherTypes...> {
-	typedef Container<RequestedType, FirstType> CurrentType;
-	typedef typename VaraintFirstContainerType<sizeof...(OtherTypes)!=0, RequestedType, OtherTypes...>::type NextType;
-	typedef typename CurrentType::ValueType CurrentValue;
-	typedef typename boost::mpl::if_<IsNotContainerTag<CurrentValue>, NextType, CurrentType>::type type;
-};
-
-
 template<JsonContainerType RequestedType, BOOST_VARIANT_ENUM_PARAMS(typename T)>
-class Container<RequestedType, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> >: public VaraintFirstContainerType<true, RequestedType, BOOST_VARIANT_ENUM_PARAMS(T)>::type {};
+class Container<RequestedType, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> >: public FirstContainerType<true, RequestedType, BOOST_VARIANT_ENUM_PARAMS(T)>::type {};
 
 } // namespace Template
 } // namespace JsonEasy

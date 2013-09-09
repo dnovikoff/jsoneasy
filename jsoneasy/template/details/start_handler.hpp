@@ -24,7 +24,14 @@ public:
 		return true;
 	}
 };
+} // namespace Details
 
+template<typename T>
+struct ExtractContainerType< Details::MoveContainer<T> > {
+	typedef T type;
+};
+
+namespace Details {
 
 /**
  * Top object to start parsing with

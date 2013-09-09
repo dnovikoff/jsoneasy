@@ -10,18 +10,6 @@ namespace Details  {
 
 template<JsonContainerType JsonType, typename ValueType, typename ParentT> class Handler;
 
-template<JsonContainerType RequestedType, typename T>
-struct GetContainerType {
-	typedef typename Container<RequestedType,T>::ValueType ValueType;
-	static const JsonContainerType value = IsNotContainerTag<ValueType>::value?NotContainer:RequestedType;
-};
-
-template<JsonContainerType RequestedType>
-struct GetContainerType <RequestedType, AnyType> {
-	// Pass to make it to take decision
-	static const JsonContainerType value = RequestedType;
-};
-
 template<bool enable, JsonContainerType JsonType, typename VT, typename ParentAssist>
 struct SubHandler {
 	static Parser::Handler::Ptr create(ParentAssist&) {
@@ -53,8 +41,8 @@ public:
 	}
 };
 
-template<JsonContainerType JsonType, typename ParentAssist>
-struct SubHandler<true, JsonType, AnyType, ParentAssist> {
+template<JsonContainerType JsonType, typename ParentAssist, typename... PossibleTypes>
+struct SubHandler<true, JsonType, AnyType<PossibleTypes...>, ParentAssist> {
 	static Parser::Handler::Ptr create(ParentAssist& assist) {
 		typedef SubHandlerCreator<JsonType, ParentAssist> CreatorType;
 		CreatorType shc(assist);

@@ -44,7 +44,7 @@ public:
 
 	TupleType data;
 	// Note for special value type
-	typedef AnyType ValueType;
+	typedef AnyType<Types...> ValueType;
 
 	// Due to AnyType we can use template parameter as argument
 	// but we also need to take care of correct conversion

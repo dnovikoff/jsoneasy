@@ -20,6 +20,7 @@ struct IsNotContainerTag<NotContainerTag> {
 };
 
 // Use as value type in case container could consist of different types (object, pair, tuple)
+template<typename... PossibleTypes>
 struct AnyType {};
 
 /**
@@ -48,6 +49,14 @@ template<JsonContainerType RequestedType, typename T>
 class Container {
 public:
 	typedef NotContainerTag ValueType;
+};
+
+template<typename T>
+struct ExtractContainerType {};
+
+template<JsonContainerType RequestedType, typename T>
+struct ExtractContainerType< Container<RequestedType, T> > {
+	typedef T type;
 };
 
 } // namespace Template

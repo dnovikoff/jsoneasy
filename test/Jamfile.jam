@@ -5,8 +5,16 @@ lib ut : : <name>boost_unit_test_framework : <link>static ;
 alias parser : ..//jsoneasy/parser/<link>static ;
 alias fortest : parser ut ;
 
-unit-test template_test : template.cpp fortest ;
-unit-test template_custom_types_test : template_custom_types.cpp fortest ;
-unit-test parse_test : parse.cpp fortest ;
+for v in [ glob *.cpp ] {
+	unit-test $(v)_test : $(v) fortest ;
+}
+
+for v in [ glob compile/*.fail.cpp ] {
+	#compile-fail $(v) ;
+}
+
+for v in [ glob compile/*.cpp : exclude-pattern compile/*.fail.cpp ] {
+	compile $(v) ;
+}
 
 #: <testing.launcher>gdb

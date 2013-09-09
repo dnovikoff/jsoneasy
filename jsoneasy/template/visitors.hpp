@@ -1,7 +1,7 @@
 #ifndef JSONEASY_TEMPLATE_VISITORS_HPP_
 #define JSONEASY_TEMPLATE_VISITORS_HPP_
 
-#include <jsoneasy/template/type.hpp>
+#include <jsoneasy/template/convert.hpp>
 
 /**
  * Set of visitors to use with AnyType
