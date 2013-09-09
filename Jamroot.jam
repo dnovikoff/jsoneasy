@@ -1,5 +1,5 @@
 project
-    : requirements <cflags>"-Werror -Wall -Wextra -Wno-long-long -Wno-non-virtual-dtor -std=c++11"
+    : requirements <cflags>"-Werror -Wall -Wextra -Wno-long-long -Wno-non-virtual-dtor -std=c++11 -pedantic -pedantic-errors"
     : requirements <variant>release
     : requirements <optimization>speed
     : requirements <inlining>full
