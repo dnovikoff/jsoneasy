@@ -1,5 +1,5 @@
 project
-    : requirements <cflags>"-ftemplate-depth-300"
+   : requirements <c++-template-depth>"300"
 ;
 
 cpp-pch grammar : grammar.hpp ;
