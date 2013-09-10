@@ -10,7 +10,7 @@ for v in [ glob *.cpp ] {
 }
 
 for v in [ glob compile/*.fail.cpp ] {
-	#compile-fail $(v) ;
+	compile-fail $(v) ;
 }
 
 for v in [ glob compile/*.cpp : exclude-pattern compile/*.fail.cpp ] {

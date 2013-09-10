@@ -4,44 +4,80 @@
 #include <jsoneasy/template/container.hpp>
 #include <jsoneasy/template/type.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/mpl/if.hpp>
 
 /**
- * Contains assert helpers for detecting if some type could be parsed from json
+ * Contains assert helpers for detecting if some type could be (potentialy) parsed from json
+ * If there will be any unparsable type - the compilation will fail
  */
 
 namespace JsonEasy {
 namespace Template {
 namespace Details  {
 
+template<bool... b> struct TraceBool {};
+
 struct OkType {};
 
-template<typename T>
-struct RequireContainerTypeAssert {
-	typedef typename Container<JsonArray,  T>::ValueType T1;
-	typedef typename Container<JsonObject, T>::ValueType T2;
-	static const bool value = !(IsNotContainerTag<T1>::value && IsNotContainerTag<T2>::value) ;
-	typedef typename boost::enable_if_c<value, OkType>::type type;
-};
-
 template<bool enabled, typename UserType, typename... OtherTypes >
-struct ConvertableFromOneOf {
+struct ConvertableFromOneOfSimpleHelper {
 	const static bool value = false;
 };
 
 template<typename UserType, typename FirstJsonType, typename... OtherTypes >
-struct ConvertableFromOneOf<true, UserType, FirstJsonType, OtherTypes...> {
+struct ConvertableFromOneOfSimpleHelper<true, UserType, FirstJsonType, OtherTypes...> {
 	const static bool value =
 		TypeConvertable<FirstJsonType, UserType>::value
-		|| ConvertableFromOneOf<sizeof...(OtherTypes)!=0, UserType, OtherTypes...>::value;
+		|| ConvertableFromOneOfSimpleHelper<sizeof...(OtherTypes)!=0, UserType, OtherTypes...>::value;
 };
 
 template<typename UserType>
-struct ConvertableFromOneOfJson {
+struct ConvertableFromOneOfSimple {
 	const static bool value =
-		RequireContainerTypeAssert<UserType>::value
-		|| ConvertableFromOneOf<true, UserType, bool ,int, double, NullTag, std::string>::value
+		ConvertableFromOneOfSimpleHelper<true, UserType, bool ,int , double, NullTag, std::string>::value
 	;
-	typedef typename boost::enable_if_c<value, OkType>::type type;
+};
+
+template<typename UserType, bool enabled=true>
+struct Convertable {
+	const static bool value = false;
+};
+
+
+template<JsonContainerType JType, typename UserType, bool enabled=true>
+struct ConveratableToContainer {
+	const static bool value = false;
+};
+
+
+template<JsonContainerType JType, typename UserType>
+struct ConveratableToContainer<JType, UserType, true> {
+	typedef Container<JType, UserType> ContainerT;
+	typedef typename ContainerT::ValueType ValueType;
+	const static bool value =
+		boost::mpl::if_<IsNotContainerTag<ValueType>, boost::mpl::bool_<false>, Convertable<ValueType> >::type::value;
+};
+
+
+template<typename FirstType, typename... OtherTypes>
+struct Convertable<AnyType<FirstType, OtherTypes...>, true> {
+	const static bool value = Convertable<FirstType>::value && ( !sizeof...(OtherTypes) || Convertable<AnyType<OtherTypes...>, sizeof...(OtherTypes)>::value );
+};
+
+template<typename UserType>
+struct Convertable<UserType, true> {
+	const static bool convertableToContainer =
+		ConveratableToContainer<JsonObject, UserType>::value
+		|| ConveratableToContainer<JsonArray, UserType>::value ;
+
+	const static bool value =
+		ConvertableFromOneOfSimple<UserType>::value
+		|| convertableToContainer;
+};
+
+template<typename T>
+struct ConvertableFromJsonContainerAssert {
+	typedef typename boost::enable_if_c<Convertable<T>::convertableToContainer, OkType>::type type;
 };
 
 } // namespace Details

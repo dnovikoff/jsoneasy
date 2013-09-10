@@ -19,10 +19,6 @@ struct IsNotContainerTag<NotContainerTag> {
 	static const bool value = true;
 };
 
-// Use as value type in case container could consist of different types (object, pair, tuple)
-template<typename... PossibleTypes>
-struct AnyType {};
-
 /**
  * There are two types of contianers: JsonObject, JsonArray
  * NotContainer - is just a special value. Instances with this template

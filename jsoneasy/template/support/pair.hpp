@@ -4,6 +4,7 @@
 #include <utility>
 
 #include <jsoneasy/template/container.hpp>
+#include <jsoneasy/template/convert.hpp>
 
 namespace JsonEasy {
 namespace Template {

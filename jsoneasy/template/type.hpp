@@ -3,6 +3,7 @@
 
 #include <type_traits>
 #include <boost/mpl/if.hpp>
+#include <jsoneasy/template/container.hpp>
 
 namespace JsonEasy {
 namespace Template {
@@ -30,10 +31,30 @@ struct Type: public NotConvertableTag {
 	static bool jsonToUser(JsonType&, UserType&) { return false; }
 };
 
+template<bool enable, typename JsonType, typename... UserTypes>
+struct TypeConvertableHelper {
+	const static bool value = false;
+};
+
+template<typename JsonType, typename UserType, typename... OtherTypes>
+struct TypeConvertableHelper<true, JsonType, UserType, OtherTypes...> {
+	const static bool value = !std::is_base_of<NotConvertableTag, Type<JsonType, UserType> >::value
+		|| TypeConvertableHelper<sizeof...(OtherTypes)!=0, JsonType, OtherTypes...>::value;
+};
+
 
 template<typename JsonType, typename UserType>
 struct TypeConvertable {
-	const static bool value = !std::is_base_of<NotConvertableTag, UserType>::value;
+	const static bool value = TypeConvertableHelper<true, JsonType, UserType>::value;
+};
+
+// Use as value type in case container could consist of different types (object, pair, tuple)
+template<typename... PossibleTypes>
+struct AnyType {};
+
+template<typename JsonType, typename... UserTypes>
+struct TypeConvertable<JsonType, AnyType<UserTypes...> > {
+	const static bool value = TypeConvertableHelper<true, JsonType, UserTypes...>::value;
 };
 
 /**

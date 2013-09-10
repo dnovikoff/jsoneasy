@@ -16,7 +16,7 @@ namespace Template {
  */
 template<typename T>
 Parser::Handler::Ptr createHandler(T& data) {
-	typedef typename Details::RequireContainerTypeAssert< T >::type StaticAssert;
+	typedef typename Details::ConvertableFromJsonContainerAssert< T >::type StaticAssert;
 	Parser::Handler::Ptr p(new Details::StartHandler<T>(data));
 	return p;
 }

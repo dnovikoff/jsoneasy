@@ -5,6 +5,7 @@
 
 #include <boost/mpl/if.hpp>
 
+#include <jsoneasy/template/convert.hpp>
 #include <jsoneasy/template/container.hpp>
 
 namespace JsonEasy {

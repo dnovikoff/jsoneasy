@@ -3,6 +3,7 @@
 
 #include <tuple>
 
+#include <jsoneasy/template/convert.hpp>
 #include <jsoneasy/template/container.hpp>
 #include <jsoneasy/template/visitors.hpp>
 
