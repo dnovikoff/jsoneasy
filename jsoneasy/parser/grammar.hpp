@@ -68,8 +68,9 @@ class Grammar : public qi::grammar<Iterator> {
 		return currentHandler()( x );
 	}
 
-	bool intParsed(int x) {
-		return p( x );
+	bool intParsed(int64_t x) {
+		Integer i(x);
+		return p( i );
 	}
 	bool boolParsed(bool x) {
 		return p( x );
@@ -147,7 +148,7 @@ public:
 	}
 	void initGrammar() {
 		using qi::lit;
-		using qi::int_;
+		using qi::long_long;
 		using qi::char_;
 		using qi::bool_;
 		using qi::_pass;
@@ -164,7 +165,7 @@ public:
 				strict_double [ BIND1(doubleParsed) ] |
 				// leading zero hack
 				char_('0')[ BIND(zeroParsed)] |
-				int_[ BIND1(intParsed) ] |
+				long_long[ BIND1(intParsed) ] |
 				bool_[ BIND1(boolParsed) ] |
 				array | map
 				) >> skipper;

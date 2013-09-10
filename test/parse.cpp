@@ -20,7 +20,9 @@ public:
 	}
 	explicit MyParser(const size_t d = 0):depth(d) {}
 
-	bool operator()(int x) override {
+	bool operator()(JsonEasy::Parser::Integer i) override {
+		int x = 0;
+		i.to( x );
 		shift() << "int=" << x << std::endl;
 		return true;
 	}

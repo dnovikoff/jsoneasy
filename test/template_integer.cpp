@@ -14,9 +14,4 @@ BOOST_AUTO_TEST_CASE ( typeTest ) {
 	bool r = JsonEasy::Template::jsonToUser(i, x);
 	BOOST_REQUIRE( r );
 	BOOST_CHECK_EQUAL( x, 64 );
-
-	const Integer i2(i);
-	r = JsonEasy::Template::jsonToUser(i2, x);
-	BOOST_REQUIRE( r );
-	BOOST_CHECK_EQUAL( x, 64 );
 }

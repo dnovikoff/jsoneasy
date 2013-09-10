@@ -34,7 +34,7 @@ struct ConvertableFromOneOfSimpleHelper<true, UserType, FirstJsonType, OtherType
 template<typename UserType>
 struct ConvertableFromOneOfSimple {
 	const static bool value =
-		ConvertableFromOneOfSimpleHelper<true, UserType, bool ,int , double, NullTag, std::string>::value
+		ConvertableFromOneOfSimpleHelper<true, UserType, bool ,Parser::Integer , double, NullTag, std::string>::value
 	;
 };
 

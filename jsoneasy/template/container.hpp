@@ -47,14 +47,6 @@ public:
 	typedef NotContainerTag ValueType;
 };
 
-template<typename T>
-struct ExtractContainerType {};
-
-template<JsonContainerType RequestedType, typename T>
-struct ExtractContainerType< Container<RequestedType, T> > {
-	typedef T type;
-};
-
 } // namespace Template
 } // namespace JsonEasy
 

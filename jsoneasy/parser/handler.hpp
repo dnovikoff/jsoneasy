@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <jsoneasy/parser/integer.hpp>
 
 namespace JsonEasy {
 namespace Parser   {
@@ -24,7 +25,7 @@ public:
 	 * return false if it this is not the type expected
 	 */
 	// @{
-	virtual bool operator()(int) = 0;
+	virtual bool operator()(Integer) = 0;
 	virtual bool operator()(bool) = 0;
 	virtual bool operator()(double) = 0;
 	virtual bool operator()(std::string&) = 0;
@@ -54,10 +55,10 @@ public:
 class BaseHandler: public Handler {
 public:
 	virtual ~BaseHandler() = 0;
-	bool operator()(int)          override { return false; }
+	bool operator()(Integer)       override { return false; }
 	bool operator()(bool)         override { return false; }
 	bool operator()(double)       override { return false; }
-	bool operator()(std::string&) override { return false; }
+	bool operator()(std::string&)  override { return false; }
 
 	bool null() override { return false; }
 

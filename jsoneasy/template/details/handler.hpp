@@ -13,6 +13,7 @@ namespace Details  {
 template<JsonContainerType JsonType, typename VT, typename ParentAssist>
 class Handler: public Parser::Handler {
 public:
+	typedef Parser::Integer Integer;
 	typedef Container<JsonType, VT> ContainerType;
 	typedef VT ValueType;
 	static const bool isObject = (JsonType==JsonObject);
@@ -24,7 +25,7 @@ public:
 	AssistType assist;
 
 	explicit Handler(ParentAssist& p): parentAssist(p), assist(container) {}
-	bool operator()(int x) override {
+	bool operator()(Integer x) override {
 		return assist.insert(x);
 	}
 	bool operator()(bool x) override {
