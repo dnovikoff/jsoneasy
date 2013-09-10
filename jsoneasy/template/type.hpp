@@ -28,7 +28,9 @@ struct NotConvertableTag {};
  */
 template<typename JsonType, typename UserType>
 struct Type: public NotConvertableTag {
-	static bool jsonToUser(JsonType&, UserType&) { return false; }
+	static bool jsonToUser(JsonType&, UserType&) {
+		return false;
+	}
 };
 
 template<bool enable, typename JsonType, typename... UserTypes>
@@ -74,15 +76,6 @@ struct Type<T,T> {
 	}
 };
 
-// Special hack for double. Integers accepted to doubles
-template<>
-struct Type<int, double> {
-	static bool jsonToUser(int& json, double& user) {
-		user = static_cast<double>(json);
-		return true;
-	}
-};
-
 template<JsonContainerType RequestedType, typename T>
 struct GetContainerType {
 	typedef typename Container<RequestedType,T>::ValueType ValueType;
@@ -111,5 +104,7 @@ struct GetContainerType <RequestedType, AnyType<PossibleTypes...> > {
 
 } // namespace Template
 } // namespace JsonEasy
+
+#include <jsoneasy/template/integer_type.hpp>
 
 #endif /* JSONEASY_TEMPLATE_TYPE_HPP_ */
