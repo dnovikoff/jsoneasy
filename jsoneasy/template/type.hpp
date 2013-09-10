@@ -36,9 +36,14 @@ struct TypeConvertableHelper {
 	const static bool value = false;
 };
 
+template<typename JsonType, typename UserType>
+struct IsConvertable {
+	const static bool value = !std::is_base_of<NotConvertableTag, Type<JsonType, UserType> >::value;
+};
+
 template<typename JsonType, typename UserType, typename... OtherTypes>
 struct TypeConvertableHelper<true, JsonType, UserType, OtherTypes...> {
-	const static bool value = !std::is_base_of<NotConvertableTag, Type<JsonType, UserType> >::value
+	const static bool value = IsConvertable<JsonType, UserType>::value
 		|| TypeConvertableHelper<sizeof...(OtherTypes)!=0, JsonType, OtherTypes...>::value;
 };
 

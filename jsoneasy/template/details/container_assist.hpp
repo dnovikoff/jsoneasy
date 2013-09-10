@@ -10,22 +10,27 @@ namespace JsonEasy {
 namespace Template {
 namespace Details  {
 
-// Selects between forcing fixed type or passing template parameter (AnyType
-template<typename T, typename ValueType>
+template<typename T, typename ValueType, bool enabled = TypeConvertable<T, ValueType>::value >
 class SelectInsert {
 public:
 	template<typename ContainerT>
+	static bool insert(ContainerT&, T&) { return false; }
+	template<typename ContainerT, typename KeyType>
+	static bool insert(ContainerT&, KeyType&, T&) { return false; }
+};
+
+// Selects between forcing fixed type or passing template parameter (AnyType
+template<typename T, typename ValueType>
+class SelectInsert<T, ValueType, true> {
+public:
+	template<typename ContainerT>
 	static bool insert(ContainerT& c, T& v) {
-		// for optimizator
-		if( !TypeConvertable<T,ValueType>::value ) return false;
 		ValueType tmp;
 		if( !jsonToUser(v, tmp) ) return false;
 		return c.insert(tmp);
 	}
 	template<typename ContainerT, typename KeyType>
 	static bool insert(ContainerT& c, KeyType& k, T& v) {
-		// for optimizator
-		if( !TypeConvertable<T,ValueType>::value ) return false;
 		ValueType tmp;
 		if( !jsonToUser(v, tmp) ) return false;
 		return c.insert(k, tmp);
@@ -33,7 +38,7 @@ public:
 };
 
 template<typename T, typename... PossibleTypes>
-class SelectInsert<T, AnyType<PossibleTypes...> > {
+class SelectInsert<T, AnyType<PossibleTypes...>, true > {
 public:
 	template<typename ContainerT>
 	static bool insert(ContainerT& c, T& v) {
@@ -63,7 +68,7 @@ public:
 
 	template<typename T>
 	bool insert(T& v) {
-		return SelectInsert<T,ValueType>::insert(container, v);
+		return SelectInsert<T, ValueType>::insert(container, v);
 	}
 
 	template<typename CreatorType>

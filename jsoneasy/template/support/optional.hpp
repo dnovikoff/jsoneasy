@@ -9,13 +9,18 @@ namespace JsonEasy {
 namespace Template {
 
 template<typename JsonType, typename T>
-struct Type<JsonType, boost::optional<T> >{
+struct Type<JsonType, boost::optional<T> > {
 	static bool jsonToUser(JsonType& j, boost::optional<T>& u) {
 		T tmp;
 		if( ! Template::jsonToUser(j, tmp) ) return false;
 		u = std::move(tmp);
 		return true;
 	}
+};
+
+template<typename JsonType, typename T>
+struct IsConvertable<JsonType, boost::optional<T> > {
+	const static bool value = IsNullTag<JsonType>::value || IsConvertable<JsonType, T>::value;
 };
 
 template<typename T>

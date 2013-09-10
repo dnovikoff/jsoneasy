@@ -13,9 +13,9 @@ namespace Template {
  */
 template<bool enabled, typename UserType>
 struct DefaultKey {
-	static bool convert(std::string&, UserType&) {
-		return false;
-	}
+//	static bool convert(std::string&, UserType&) {
+//		return false;
+//	}
 };
 
 /**
