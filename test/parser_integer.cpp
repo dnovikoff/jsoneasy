@@ -81,3 +81,24 @@ BOOST_AUTO_TEST_CASE ( doubleTest ) {
 	BOOST_REQUIRE( i.to(v) );
 	BOOST_CHECK_EQUAL( v, -128.0 );
 }
+
+BOOST_AUTO_TEST_CASE ( int64Test ) {
+	Integer i( 9223372036854775807 ) ;
+	int64_t v;
+	BOOST_REQUIRE( i.to(v) );
+	BOOST_CHECK_EQUAL( v, 9223372036854775807 );
+
+	i = Integer( std::numeric_limits<int64_t>::min() );
+	BOOST_REQUIRE( i.to(v) );
+	BOOST_CHECK_EQUAL( v, std::numeric_limits<int64_t>::min() );
+}
+
+BOOST_AUTO_TEST_CASE ( uint64Test ) {
+	Integer i( 9223372036854775807 ) ;
+	uint64_t v;
+	BOOST_REQUIRE( i.to(v) );
+	BOOST_CHECK_EQUAL( v, 9223372036854775807 );
+
+	i = Integer( std::numeric_limits<int64_t>::min() );
+	BOOST_REQUIRE( !i.to(v) );
+}
