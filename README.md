@@ -11,7 +11,7 @@ Now it is just a draft.
 To be done:
 - Add generator
 - Finish with existing template parser
-- Add tree parser, base on boost::variant
+- Add tree parser, based on boost::variant
 
 Docs:
 - JSON specification http://www.json.org/
