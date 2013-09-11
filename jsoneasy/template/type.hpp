@@ -20,18 +20,23 @@ struct IsNullTag<NullTag> {
 	static const bool value = true;
 };
 
-struct NotConvertableTag {};
+struct NotConvertable {
+	template<typename JsonType, typename UserType>
+	static bool jsonToUser(JsonType&, UserType&) {
+		return false;
+	}
+};
+
+// Will try with Json fixed tpye(ex. Integer) after right type fails
+template<typename JsonType, typename UserType>
+struct LeftType: public NotConvertable {};
 
 /**
  * Describes how User Types converts with Simple types
  * Not allowed to convert by default
  */
 template<typename JsonType, typename UserType>
-struct Type: public NotConvertableTag {
-	static bool jsonToUser(JsonType&, UserType&) {
-		return false;
-	}
-};
+struct Type: public LeftType<JsonType, UserType> {};
 
 template<bool enable, typename JsonType, typename... UserTypes>
 struct TypeConvertableHelper {
@@ -40,7 +45,7 @@ struct TypeConvertableHelper {
 
 template<typename JsonType, typename UserType>
 struct IsConvertable {
-	const static bool value = !std::is_base_of<NotConvertableTag, Type<JsonType, UserType> >::value;
+	const static bool value = !std::is_base_of<NotConvertable, Type<JsonType, UserType> >::value;
 };
 
 template<typename JsonType, typename UserType, typename... OtherTypes>

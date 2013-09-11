@@ -1,6 +1,8 @@
 #ifndef JSONEASY_TEMPLATE_INTEGER_TYPE_HPP_
 #define JSONEASY_TEMPLATE_INTEGER_TYPE_HPP_
 
+#include <boost/mpl/if.hpp>
+
 #include <jsoneasy/parser/integer.hpp>
 #include <jsoneasy/template/type.hpp>
 
@@ -14,21 +16,13 @@ struct IntegerType {
 	}
 };
 
-#define JSONEASY_INTEGER_TYPE(X) template<> struct Type<Parser::Integer, X>: public IntegerType<X> {};
-#define JSONEASY_INTEGER_TYPE1(X) JSONEASY_INTEGER_TYPE(X) JSONEASY_INTEGER_TYPE(u##X)
-#define JSONEASY_INTEGER_TYPE2(X) JSONEASY_INTEGER_TYPE1(int##X##_t)
+template<typename UserType>
+struct ConvertableFromInteger {
+	static const bool value = !std::is_same<UserType,bool>::value && (std::is_integral<UserType>::value || std::is_floating_point<UserType>::value);
+};
 
-JSONEASY_INTEGER_TYPE2(8)
-JSONEASY_INTEGER_TYPE2(16)
-JSONEASY_INTEGER_TYPE2(32)
-JSONEASY_INTEGER_TYPE2(64)
-JSONEASY_INTEGER_TYPE(double)
-JSONEASY_INTEGER_TYPE(float)
-JSONEASY_INTEGER_TYPE(char)
-
-#undef JSONEASY_INTEGER_TYPE
-#undef JSONEASY_INTEGER_TYPE1
-#undef JSONEASY_INTEGER_TYPE2
+template<typename UserType>
+struct LeftType<Parser::Integer, UserType>: public boost::mpl::if_<ConvertableFromInteger<UserType>, IntegerType<UserType>, NotConvertable >::type {};
 
 } // namespace Template
 } // namespace JsonEasy
