@@ -10,16 +10,6 @@ namespace Template {
 
 struct NullTag {};
 
-template<typename T>
-struct IsNullTag {
-	static const bool value = false;
-};
-
-template<>
-struct IsNullTag<NullTag> {
-	static const bool value = true;
-};
-
 struct NotConvertable {
 	template<typename JsonType, typename UserType>
 	static bool jsonToUser(JsonType&, UserType&) {
@@ -33,7 +23,7 @@ struct LeftType: public NotConvertable {};
 
 /**
  * Describes how User Types converts with Simple types
- * Not allowed to convert by default
+ * If none of UserType specializations found - will try to find JsonType specialization
  */
 template<typename JsonType, typename UserType>
 struct Type: public LeftType<JsonType, UserType> {};

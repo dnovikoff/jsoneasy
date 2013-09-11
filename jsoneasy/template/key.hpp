@@ -12,11 +12,7 @@ namespace Template {
  * See support/key_lexical_cast.hpp as an example
  */
 template<bool enabled, typename UserType>
-struct DefaultKey {
-//	static bool convert(std::string&, UserType&) {
-//		return false;
-//	}
-};
+struct DefaultKey {};
 
 /**
  * This class describes how string key could be converted to other types

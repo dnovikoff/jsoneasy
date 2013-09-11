@@ -9,6 +9,11 @@
 namespace JsonEasy {
 namespace Template {
 
+/**
+ * Integer will be converted to any integral type (except for bool)
+ * floating pointer types are also accepted
+ */
+
 template<typename T>
 struct IntegerType {
 	static bool jsonToUser(const Parser::Integer& i, T& user) {

@@ -18,11 +18,6 @@ struct Type<JsonType, boost::optional<T> > {
 	}
 };
 
-template<typename JsonType, typename T>
-struct IsConvertable<JsonType, boost::optional<T> > {
-	const static bool value = IsNullTag<JsonType>::value || IsConvertable<JsonType, T>::value;
-};
-
 template<typename T>
 struct Type<NullTag, boost::optional<T> >{
 	static bool jsonToUser(NullTag&, boost::optional<T>&) {
