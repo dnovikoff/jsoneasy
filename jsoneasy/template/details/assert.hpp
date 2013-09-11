@@ -61,7 +61,7 @@ struct ConveratableToContainer<JType, UserType, true> {
 
 template<typename FirstType, typename... OtherTypes>
 struct Convertable<AnyType<FirstType, OtherTypes...>, true> {
-	const static bool value = Convertable<FirstType>::value && ( !sizeof...(OtherTypes) || Convertable<AnyType<OtherTypes...>, sizeof...(OtherTypes)>::value );
+	const static bool value = Convertable<FirstType>::value && ( sizeof...(OtherTypes)==0 || Convertable<AnyType<OtherTypes...>, sizeof...(OtherTypes)!=0>::value );
 };
 
 template<typename UserType>

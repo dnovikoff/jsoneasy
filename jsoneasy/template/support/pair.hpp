@@ -47,9 +47,9 @@ public:
 	template<typename C>
 	typename boost::enable_if<NotSame<C>, bool>::type create(C& x) {
 		if( index == 0) {
-			x.create<typename PairType::first_type>();
+			x.template create<typename PairType::first_type>();
 		} else if( index == 1) {
-			x.create<typename PairType::second_type>();
+			x.template create<typename PairType::second_type>();
 		} else {
 			return false;
 		}

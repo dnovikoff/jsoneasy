@@ -17,7 +17,7 @@ enum VariantHelperState {VariantEnd, VariantOne, VaraintMore};
 
 template<typename FirstType, typename... NextTypes>
 struct GetNextState {
-	static const VariantHelperState value = sizeof...(NextTypes)>0?VaraintMore:VariantOne;
+	static const VariantHelperState value = (sizeof...(NextTypes) != 0)?VaraintMore:VariantOne;
 };
 
 template<typename... NextTypes>

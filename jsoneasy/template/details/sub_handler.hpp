@@ -37,7 +37,7 @@ public:
 	bool create() {
 		static const bool enabled = (JsonType==GetContainerType<JsonType, ValueType>::value);
 		ptr = std::move( SubHandler<enabled, JsonType, ValueType, ParentAssist>::create(assist));
-		return ptr != NULL;
+		return !(!ptr);
 	}
 };
 

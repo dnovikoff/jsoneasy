@@ -73,7 +73,7 @@ public:
 
 	template<typename CreatorType>
 	void create(CreatorType& x) {
-		container.create<CreatorType>(x);
+		container.template create<CreatorType>(x);
 	}
 };
 
@@ -104,7 +104,7 @@ public:
 
 	template<typename CreatorType>
 	void create(CreatorType& x) {
-		container.create<CreatorType>(x);
+		container.template create<CreatorType>(x);
 	}
 };
 
