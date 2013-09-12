@@ -42,32 +42,14 @@ struct ConvertableFromOneOfSimple {
 	;
 };
 
-template<typename UserType>
-struct Convertable;
-
-template<JsonContainerType JType, typename UserType, bool enabled=true>
-struct ConveratableToContainer {
-	const static bool value = false;
-};
-
+template<typename UserType> struct Convertable;
 
 template<JsonContainerType JType, typename UserType>
-struct ConveratableToContainer<JType, UserType, true> {
+struct ConveratableToContainer {
 	typedef Container<JType, UserType> ContainerT;
 	typedef typename ContainerT::ValueType ValueType;
 	const static bool value =
 		boost::mpl::if_<IsNotContainerTag<ValueType>, boost::mpl::bool_<false>, Convertable<ValueType> >::type::value;
-};
-
-
-template<typename FirstType>
-struct Convertable< AnyType<FirstType> > {
-	const static bool value = Convertable<FirstType>::value;
-};
-
-template<typename FirstType, typename... OtherTypes>
-struct Convertable< AnyType<FirstType, OtherTypes...> > {
-	const static bool value = Convertable<FirstType>::value && ( Convertable< AnyType<OtherTypes...> >::value );
 };
 
 template<typename UserType>
@@ -79,6 +61,16 @@ struct Convertable {
 	const static bool value =
 		ConvertableFromOneOfSimple<UserType>::value
 		|| convertableToContainer;
+};
+
+template<typename FirstType>
+struct Convertable< AnyType<FirstType> > {
+	const static bool value = Convertable<FirstType>::value;
+};
+
+template<typename FirstType, typename... OtherTypes>
+struct Convertable< AnyType<FirstType, OtherTypes...> > {
+	const static bool value = Convertable<FirstType>::value && ( Convertable< AnyType<OtherTypes...> >::value );
 };
 
 template<typename T>
