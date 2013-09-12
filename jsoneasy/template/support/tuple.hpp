@@ -10,29 +10,42 @@
 namespace JsonEasy {
 namespace Template {
 
-template<bool enable, size_t Iterator, typename TupleType>
-struct IndexHelper {
+template<size_t I>
+struct IndexIterator {
+	static const size_t value = I;
+	typedef IndexIterator< I + 1 > next;
+};
+
+// Only declaration. Type is used only as template arg
+struct IndexEndIterator;
+
+template<typename TupleType, typename Iterator>
+struct IndexHelper;
+
+template<typename TupleType>
+struct IndexHelper< TupleType, IndexEndIterator > {
 	template<typename T>
 	static bool apply(TupleType&, const size_t, T&) { return false; }
 };
 
-template< size_t Iterator, typename TupleType>
-struct IndexHelper<true, Iterator, TupleType> {
+template<typename TupleType, typename Iterator>
+struct IndexHelper {
 	template<typename VisitorType>
 	static bool apply(TupleType& t, const size_t index, VisitorType& visitor) {
-		if(Iterator == index) {
-			return visitor(std::get<Iterator>(t));
+		if(Iterator::value == index) {
+			return visitor(std::get<Iterator::value>(t));
 		}
-		static const size_t NextIterator = Iterator + 1;
-		static const size_t tupleSize = std::tuple_size<TupleType>::value;
-		static const bool enabled = NextIterator < tupleSize;
-		return IndexHelper< enabled, NextIterator, TupleType>::apply(t, index, visitor);
+		typedef typename Iterator::next NextIndex;
+		static const bool more = ( NextIndex::value < std::tuple_size<TupleType>::value );
+		typedef typename boost::mpl::if_c<more, NextIndex, IndexEndIterator>::type NextIterator;
+		return IndexHelper<TupleType, NextIterator>::apply(t, index, visitor);
 	}
 };
 
 template<typename TupleType, typename ActionType>
 static bool applyIndexHelper(TupleType& t, const size_t index, ActionType& act) {
-	return IndexHelper<true, 0u, TupleType>::apply(t, index, act);
+	if(index >= std::tuple_size<TupleType>::value) return false;
+	return IndexHelper<TupleType, IndexIterator<0u> >::apply(t, index, act);
 }
 
 template<typename... Types>
