@@ -77,7 +77,10 @@ constexpr ClassInfo<FieldInfo<Type, FieldType> > createClass( const char(&str)[N
 }
 
 #define JSONEASY_TEMPLATE_CLASS_INFO1( X ) static auto metadata() -> decltype( X ) { return X; }
-#define JSONEASY_TEMPLATE_CLASS_INFO( X ) JSONEASY_TEMPLATE_CLASS_INFO1( createClass X )
+#define JE_META( NAME, X ) typedef NAME ClassType; JSONEASY_TEMPLATE_CLASS_INFO1( createClass X )
+#define JE_FIELD( X ) ( #X, &ClassType::X )
+#define JE_CLASS( NAME, X ) template<> class Class<NAME> { public: JE_META( NAME, X ) };
+#define JE_CLASS_NS( NAME, X ) namespace JsonEasy { namespace Template { JE_CLASS( NAME, X ) } }
 
 } // namespace Template
 } // namespace JsonEasy

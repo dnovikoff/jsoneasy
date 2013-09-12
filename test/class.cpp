@@ -11,23 +11,13 @@
 
 #include "one_array.hpp"
 
-namespace JsonEasy {
-namespace Template {
-
 struct Example {
 	int first;
 	int second;
 	std::string other;
 };
 
-template<>
-class Class<Example> {
-public:
-	JSONEASY_TEMPLATE_CLASS_INFO( ("first", &Example::first)("second", &Example::second) );
-};
-
-} // namespace Template
-} // namespace JsonEasy
+JE_CLASS_NS( Example , JE_FIELD(first)JE_FIELD(second) )
 
 BOOST_AUTO_TEST_CASE ( simple ) {
 
