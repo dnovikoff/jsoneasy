@@ -11,12 +11,6 @@ struct NotClass {};
 template<typename T>
 class Class: public NotClass {};
 
-struct Example {
-	int first;
-	int second;
-	std::string other;
-};
-
 class String {
 	const char * const begin_;
 	size_t size_;
@@ -26,7 +20,7 @@ public:
 		static_assert( N >= 1, "not a string literal");
 	}
 
-	constexpr const char * const toString() const {
+	constexpr const char * cString() const {
 		return begin_;
 	}
 
@@ -37,31 +31,53 @@ public:
 
 template<typename Type, typename FieldType>
 class FieldInfo {
+	typedef FieldInfo<Type, FieldType> self_t;
 	const String name;
 	FieldType Type::* field;
 public:
 	constexpr FieldInfo( const String n, FieldType Type::* f ) : name(n), field(f) {}
 };
 
-template<typename FieldType, typename Type, size_t N>
-constexpr FieldInfo<Type, FieldType> createInfo(const char(&arr)[N], FieldType Type::* f) {
-	return FieldInfo<Type, FieldType>( String(arr), f);
+template<typename FirstField, typename... OtherFields>
+class ClassInfo;
+
+template<typename FirstField>
+class ClassInfo<FirstField> {
+	const FirstField field;
+	typedef ClassInfo<FirstField> self_t;
+public:
+	constexpr explicit ClassInfo(const FirstField& ff):field(ff) {}
+
+	template<typename Type, typename FieldType, size_t N>
+	constexpr ClassInfo<FirstField, FieldInfo<Type, FieldType> > operator()( const char(&str)[N], FieldType Type::* f ) {
+		return ClassInfo<FirstField, FieldInfo<Type, FieldType> >( FieldInfo<Type, FieldType>(String(str), f), *this );
+	}
+};
+
+template<typename FirstField, typename... OtherFields>
+class ClassInfo {
+	typedef ClassInfo<FirstField> OneParent;
+	typedef ClassInfo<OtherFields...> OtherParent;
+
+	OneParent one;
+	OtherParent other;
+	typedef ClassInfo<FirstField, OtherFields...> self_t;
+public:
+	constexpr ClassInfo(const FirstField& ff, const OtherParent& op):one(ff), other(op) {}
+
+	template<typename Type, typename FieldType, size_t N>
+	constexpr ClassInfo<FieldInfo<Type, FieldType>, FirstField, OtherFields...> operator()( const char(&str)[N], FieldType Type::* f ) {
+		return ClassInfo<FieldInfo<Type, FieldType>, FirstField, OtherFields... >( FieldInfo<Type, FieldType>(String(str), f), *this );
+	}
+};
+
+template<typename Type, typename FieldType, size_t N>
+constexpr ClassInfo<FieldInfo<Type, FieldType> > createClass( const char(&str)[N], FieldType Type::* f ) {
+	return ClassInfo<FieldInfo<Type, FieldType> >( FieldInfo<Type, FieldType>(String(str), f) );
 }
 
-template<typename... Fields>
-class ClassInfo {
-public:
-	constexpr ClassInfo() {}
-};
-
-
-#define JSONEASY_TEMPLATE_CLASS_INFO( X ) static auto info() -> decltype( X ) { return X; }
-
-template<>
-class Class<Example> {
-public:
-	JSONEASY_TEMPLATE_CLASS_INFO( createInfo("first", &Example::first));
-};
+#define JSONEASY_TEMPLATE_CLASS_INFO1( X ) static auto metadata() -> decltype( X ) { return X; }
+#define JSONEASY_TEMPLATE_CLASS_INFO( X ) JSONEASY_TEMPLATE_CLASS_INFO1( createClass X )
 
 } // namespace Template
 } // namespace JsonEasy
