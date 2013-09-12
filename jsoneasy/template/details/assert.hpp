@@ -14,8 +14,6 @@ namespace JsonEasy {
 namespace Template {
 namespace Details  {
 
-template<bool... b> struct TraceBool {};
-
 struct OkType {};
 
 template<typename UserType, typename FirstJsonType, typename... OtherTypes>
