@@ -2,7 +2,6 @@
 #define JSONEASY_TEMPLATE_TYPE_HPP_
 
 #include <type_traits>
-#include <boost/mpl/if.hpp>
 #include <jsoneasy/template/container.hpp>
 
 namespace JsonEasy {
@@ -89,7 +88,7 @@ template<JsonContainerType RequestedType, typename FirstType, typename... OtherT
 struct FirstContainerType {
 	typedef FirstContainerType<RequestedType, FirstType> CurrentOne;
 	typedef typename CurrentOne::type::ValueType CurrentValue;
-	typedef typename boost::mpl::if_<IsNotContainerTag<CurrentValue>, FirstContainerType<RequestedType, OtherTypes...>, CurrentOne>::type::type type;
+	typedef typename std::conditional<IsNotContainerTag<CurrentValue>::value, FirstContainerType<RequestedType, OtherTypes...>, CurrentOne>::type::type type;
 };
 
 template<JsonContainerType RequestedType,typename... PossibleTypes>

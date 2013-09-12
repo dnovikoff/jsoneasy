@@ -2,6 +2,7 @@
 #define JSONEASY_TEMPLATE_TUPLE_HPP_
 
 #include <tuple>
+#include <type_traits>
 
 #include <jsoneasy/template/convert.hpp>
 #include <jsoneasy/template/container.hpp>
@@ -37,7 +38,7 @@ struct IndexHelper {
 		}
 		typedef typename Iterator::next NextIndex;
 		static const bool more = ( NextIndex::value < std::tuple_size<TupleType>::value );
-		typedef typename boost::mpl::if_c<more, NextIndex, IndexEndIterator>::type NextIterator;
+		typedef typename std::conditional<more, NextIndex, IndexEndIterator>::type NextIterator;
 		return IndexHelper<TupleType, NextIterator>::apply(t, index, visitor);
 	}
 };

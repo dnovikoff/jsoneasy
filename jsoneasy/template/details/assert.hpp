@@ -2,6 +2,7 @@
 #define JSONEASY_TEMPLATE_DETAILS_ASSERT_HPP_
 
 #include <type_traits>
+#include <boost/mpl/bool.hpp>
 #include <jsoneasy/template/container.hpp>
 #include <jsoneasy/template/type.hpp>
 

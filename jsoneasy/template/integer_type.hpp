@@ -1,8 +1,6 @@
 #ifndef JSONEASY_TEMPLATE_INTEGER_TYPE_HPP_
 #define JSONEASY_TEMPLATE_INTEGER_TYPE_HPP_
 
-#include <boost/mpl/if.hpp>
-
 #include <jsoneasy/parser/integer.hpp>
 #include <jsoneasy/template/type.hpp>
 
@@ -27,7 +25,7 @@ struct ConvertableFromInteger {
 };
 
 template<typename UserType>
-struct LeftType<Parser::Integer, UserType>: public boost::mpl::if_<ConvertableFromInteger<UserType>, IntegerType<UserType>, NotConvertable >::type {};
+struct LeftType<Parser::Integer, UserType>: public std::conditional<ConvertableFromInteger<UserType>::value, IntegerType<UserType>, NotConvertable >::type {};
 
 } // namespace Template
 } // namespace JsonEasy
