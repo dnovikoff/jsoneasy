@@ -19,22 +19,26 @@ template<bool... b> struct TraceBool {};
 
 struct OkType {};
 
-template<bool enabled, typename UserType, typename... OtherTypes >
-struct ConvertableFromOneOfSimpleHelper {
-	const static bool value = false;
+template<typename UserType, typename FirstJsonType, typename... OtherTypes>
+struct ConvertableFromOneOfSimpleHelper;
+
+
+template<typename UserType, typename JsonType>
+struct ConvertableFromOneOfSimpleHelper<UserType, JsonType> {
+	const static bool value = TypeConvertable<JsonType, UserType>::value ;
 };
 
 template<typename UserType, typename FirstJsonType, typename... OtherTypes >
-struct ConvertableFromOneOfSimpleHelper<true, UserType, FirstJsonType, OtherTypes...> {
+struct ConvertableFromOneOfSimpleHelper {
 	const static bool value =
-		TypeConvertable<FirstJsonType, UserType>::value
-		|| ConvertableFromOneOfSimpleHelper<sizeof...(OtherTypes)!=0, UserType, OtherTypes...>::value;
+		ConvertableFromOneOfSimpleHelper<UserType, FirstJsonType>::value
+		|| ConvertableFromOneOfSimpleHelper<UserType, OtherTypes...>::value;
 };
 
 template<typename UserType>
 struct ConvertableFromOneOfSimple {
 	const static bool value =
-		ConvertableFromOneOfSimpleHelper<true, UserType, bool ,Parser::Integer , double, NullTag, std::string>::value
+		ConvertableFromOneOfSimpleHelper<UserType, bool ,Parser::Integer , double, NullTag, std::string>::value
 	;
 };
 
