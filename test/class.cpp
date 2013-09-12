@@ -10,6 +10,7 @@
 #include <jsoneasy/template/class.hpp>
 
 #include "one_array.hpp"
+#include "parse_string.hpp"
 
 struct Example {
 	int first;
