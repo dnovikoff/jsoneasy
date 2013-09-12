@@ -2,9 +2,7 @@
 #define JSONEASY_TEMPLATE_PAIR_HPP_
 
 #include <utility>
-
-#include <boost/mpl/if.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 
 #include <jsoneasy/template/container.hpp>
 #include <jsoneasy/template/convert.hpp>
@@ -26,7 +24,7 @@ public:
 
 	PairType data;
 	// If types are some - optimize
-	typedef typename boost::mpl::if_<NotSame<>, AnyType<T1,T2>, T1>::type ValueType;
+	typedef typename std::conditional<NotSame<>::value, AnyType<T1,T2>, T1>::type ValueType;
 
 	// Due to AnyType we can use template parameter as argument
 	// but we also need to take care of correct conversion
@@ -45,7 +43,7 @@ public:
 	bool validate() { return index==2; } // exactly two elements
 
 	template<typename C>
-	typename boost::enable_if<NotSame<C>, bool>::type create(C& x) {
+	typename std::enable_if<NotSame<C>::value, bool>::type create(C& x) {
 		if( index == 0) {
 			x.template create<typename PairType::first_type>();
 		} else if( index == 1) {

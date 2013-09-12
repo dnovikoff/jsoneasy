@@ -1,10 +1,9 @@
 #ifndef JSONEASY_TEMPLATE_DETAILS_ASSERT_HPP_
 #define JSONEASY_TEMPLATE_DETAILS_ASSERT_HPP_
 
+#include <type_traits>
 #include <jsoneasy/template/container.hpp>
 #include <jsoneasy/template/type.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/mpl/if.hpp>
 
 /**
  * Contains assert helpers for detecting if some type could be (potentialy) parsed from json
@@ -49,7 +48,7 @@ struct ConveratableToContainer {
 	typedef Container<JType, UserType> ContainerT;
 	typedef typename ContainerT::ValueType ValueType;
 	const static bool value =
-		boost::mpl::if_<IsNotContainerTag<ValueType>, boost::mpl::bool_<false>, Convertable<ValueType> >::type::value;
+		std::conditional<IsNotContainerTag<ValueType>::value, boost::mpl::bool_<false>, Convertable<ValueType> >::type::value;
 };
 
 template<typename UserType>
@@ -75,7 +74,7 @@ struct Convertable< AnyType<FirstType, OtherTypes...> > {
 
 template<typename T>
 struct ConvertableFromJsonContainerAssert {
-	typedef typename boost::enable_if_c<Convertable<T>::convertableToContainer, OkType>::type type;
+	typedef typename std::enable_if<Convertable<T>::convertableToContainer, OkType>::type type;
 };
 
 } // namespace Details
