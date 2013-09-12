@@ -28,8 +28,9 @@ public:
 
 	// Due to AnyType we can use template parameter as argument
 	// but we also need to take care of correct conversion
+	// insert function could be called by handler only with T1 or T2 args
 	template<typename T>
-	bool insert(T& x) {
+	typename std::enable_if< TypeConvertable<T, ValueType>::value, bool>::type insert(T& x) {
 		++index;
 		if(index == 1) {
 			return jsonToUser(x, data.first);
@@ -42,6 +43,9 @@ public:
 
 	bool validate() { return index==2; } // exactly two elements
 
+	/**
+	 * Should not be called if T1=T2
+	 */
 	template<typename C>
 	typename std::enable_if<NotSame<C>::value, bool>::type create(C& x) {
 		if( index == 0) {
