@@ -42,11 +42,8 @@ struct ConvertableFromOneOfSimple {
 	;
 };
 
-template<typename UserType, bool enabled=true>
-struct Convertable {
-	const static bool value = false;
-};
-
+template<typename UserType>
+struct Convertable;
 
 template<JsonContainerType JType, typename UserType, bool enabled=true>
 struct ConveratableToContainer {
@@ -63,13 +60,18 @@ struct ConveratableToContainer<JType, UserType, true> {
 };
 
 
+template<typename FirstType>
+struct Convertable< AnyType<FirstType> > {
+	const static bool value = Convertable<FirstType>::value;
+};
+
 template<typename FirstType, typename... OtherTypes>
-struct Convertable<AnyType<FirstType, OtherTypes...>, true> {
-	const static bool value = Convertable<FirstType>::value && ( sizeof...(OtherTypes)==0 || Convertable<AnyType<OtherTypes...>, sizeof...(OtherTypes)!=0>::value );
+struct Convertable< AnyType<FirstType, OtherTypes...> > {
+	const static bool value = Convertable<FirstType>::value && ( Convertable< AnyType<OtherTypes...> >::value );
 };
 
 template<typename UserType>
-struct Convertable<UserType, true> {
+struct Convertable {
 	const static bool convertableToContainer =
 		ConveratableToContainer<JsonObject, UserType>::value
 		|| ConveratableToContainer<JsonArray, UserType>::value ;
