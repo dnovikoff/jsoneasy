@@ -13,27 +13,11 @@ namespace Template {
 
 typedef  boost::detail::variant::void_ VariantEndType;
 
-enum VariantHelperState {VariantEnd, VariantOne, VaraintMore};
-
-template<typename FirstType, typename... NextTypes>
-struct GetNextState {
-	static const VariantHelperState value = (sizeof...(NextTypes) != 0)?VaraintMore:VariantOne;
-};
-
-template<typename... NextTypes>
-struct GetNextState<VariantEndType, NextTypes...> {
-	static const VariantHelperState value = VariantEnd;
-};
-
-template<VariantHelperState State, typename JsonType, typename VariantT, typename CurrentType, typename... OtherTypes>
-struct VariantHelper {
-	static bool apply(JsonType&, VariantT&) {
-		return false;
-	}
-};
-
 template<typename JsonType, typename VariantT, typename CurrentType, typename... OtherTypes>
-struct VariantHelper<VariantOne, JsonType, VariantT, CurrentType, OtherTypes...> {
+struct VariantHelper;
+
+template<typename JsonType, typename VariantT, typename CurrentType>
+struct VariantHelperOne {
 	static bool apply(JsonType& j, VariantT& u) {
 		if( !TypeConvertable<JsonType, CurrentType>::value ) return false;
 		CurrentType tmp;
@@ -43,19 +27,19 @@ struct VariantHelper<VariantOne, JsonType, VariantT, CurrentType, OtherTypes...>
 	}
 };
 
+template<typename JsonType, typename VariantT, typename CurrentType>
+struct VariantHelper<JsonType, VariantT, CurrentType>: public VariantHelperOne<JsonType, VariantT, CurrentType> {};
+
+template<typename JsonType, typename VariantT, typename CurrentType, typename... MoreNulls>
+struct VariantHelper<JsonType, VariantT, CurrentType, VariantEndType, MoreNulls...>: public VariantHelperOne<JsonType, VariantT, CurrentType> {};
+
 template<typename JsonType, typename VariantT, typename CurrentType, typename... OtherTypes>
-struct VariantHelper<VaraintMore, JsonType, VariantT, CurrentType, OtherTypes...> {
+struct VariantHelper {
 	static bool apply(JsonType& j, VariantT& u) {
-		if( VariantHelper<VariantOne, JsonType, VariantT, CurrentType, OtherTypes...>::apply(j, u) ) return true;
-		// try next type
-		return VariantHelper<GetNextState<OtherTypes...>::value, JsonType, VariantT, OtherTypes...>::apply(j, u);
+		if( VariantHelper<JsonType, VariantT, CurrentType>::apply(j, u) ) return true;
+		return VariantHelper<JsonType, VariantT, OtherTypes...>::apply(j, u);
 	}
 };
-
-template<typename JsonType, typename VariantT, typename... AllTypes>
-static bool varinatHelper(JsonType& j, VariantT& u) {
-	return VariantHelper<GetNextState<AllTypes...>::value, JsonType, VariantT, AllTypes...>::apply(j,u);
-}
 
 // variatic template params could compile only for gcc for this case
 // using BOOST_VARIANT_ENUM_PARAMS compiles for both
@@ -63,7 +47,7 @@ template<typename JsonType, BOOST_VARIANT_ENUM_PARAMS(typename T)>
 struct Type<JsonType, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> >{
 	typedef boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> VarinatType;
 	static bool jsonToUser(JsonType& j, VarinatType& u) {
-		return varinatHelper<JsonType, VarinatType, BOOST_VARIANT_ENUM_PARAMS(T)>(j,u);
+		return VariantHelper<JsonType, VarinatType, BOOST_VARIANT_ENUM_PARAMS(T)>::apply(j,u);
 	}
 };
 
