@@ -77,23 +77,25 @@ struct GetContainerType {
 	static const JsonContainerType value = IsNotContainerTag<ValueType>::value?NotContainer:RequestedType;
 };
 
-template<bool enabled, JsonContainerType RequestedType, typename... OtherTypes>
-struct FirstContainerType {
-	typedef Container<RequestedType, NotContainerTag> type;
+template<JsonContainerType RequestedType, typename FirstType, typename... OtherTypes>
+struct FirstContainerType;
+
+template<JsonContainerType RequestedType, typename FirstType>
+struct FirstContainerType<RequestedType, FirstType> {
+	typedef Container<RequestedType, FirstType> type;
 };
 
 template<JsonContainerType RequestedType, typename FirstType, typename... OtherTypes>
-struct FirstContainerType<true, RequestedType, FirstType, OtherTypes...> {
-	typedef Container<RequestedType, FirstType> CurrentType;
-	typedef typename FirstContainerType<sizeof...(OtherTypes)!=0, RequestedType, OtherTypes...>::type NextType;
-	typedef typename CurrentType::ValueType CurrentValue;
-	typedef typename boost::mpl::if_<IsNotContainerTag<CurrentValue>, NextType, CurrentType>::type type;
+struct FirstContainerType {
+	typedef FirstContainerType<RequestedType, FirstType> CurrentOne;
+	typedef typename CurrentOne::type::ValueType CurrentValue;
+	typedef typename boost::mpl::if_<IsNotContainerTag<CurrentValue>, FirstContainerType<RequestedType, OtherTypes...>, CurrentOne>::type::type type;
 };
 
 template<JsonContainerType RequestedType,typename... PossibleTypes>
 struct GetContainerType <RequestedType, AnyType<PossibleTypes...> > {
 	// Pass to make it to take decision
-	typedef typename FirstContainerType<true, RequestedType, PossibleTypes...>::type::ValueType ValueType;
+	typedef typename FirstContainerType<RequestedType, PossibleTypes...>::type::ValueType ValueType;
 	static const JsonContainerType value = IsNotContainerTag<ValueType>::value?NotContainer:RequestedType;
 };
 

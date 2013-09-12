@@ -52,7 +52,7 @@ struct Type<JsonType, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> >{
 };
 
 template<JsonContainerType RequestedType, BOOST_VARIANT_ENUM_PARAMS(typename T)>
-class Container<RequestedType, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> >: public FirstContainerType<true, RequestedType, BOOST_VARIANT_ENUM_PARAMS(T)>::type {};
+class Container<RequestedType, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> >: public FirstContainerType<RequestedType, BOOST_VARIANT_ENUM_PARAMS(T)>::type {};
 
 } // namespace Template
 } // namespace JsonEasy
