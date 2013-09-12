@@ -11,23 +11,16 @@
 #include <jsoneasy/template/create.hpp>
 
 #include <test/one_array.hpp>
-
-template<typename T>
-static bool parseTo(const std::string& input, T& data) {
-	JsonEasy::Parser::Handler::Ptr h = JsonEasy::Template::createHandler(data);
-	JsonEasy::Parser::StringParser sp;
-	if( !sp.parse(input, h) ) return false;
-	return true;
-}
+#include <test/parse_string.hpp>
 
 BOOST_AUTO_TEST_CASE ( oneTest ) {
 	OneArray<int> x;
-	BOOST_CHECK( !parseTo("[]", x) );
-	BOOST_CHECK( !parseTo(R"(["hello"])", x) );
-	BOOST_CHECK( !parseTo("[6,8]", x) );
-	BOOST_CHECK( parseTo("[517]", x) );
+	BOOST_CHECK( !parseString("[]", x) );
+	BOOST_CHECK( !parseString(R"(["hello"])", x) );
+	BOOST_CHECK( !parseString("[6,8]", x) );
+	BOOST_CHECK( parseString("[517]", x) );
 	BOOST_CHECK_EQUAL( x.value, 517);
-	BOOST_CHECK( parseTo(R"([916])", x) );
+	BOOST_CHECK( parseString(R"([916])", x) );
 	BOOST_CHECK_EQUAL( x.value, 916);
 }
 
@@ -78,17 +71,17 @@ struct Type<std::string, StringClass<MaxChars> >{
 
 BOOST_AUTO_TEST_CASE ( stringClassTest ) {
 	OneArray<StringClass<3> > x;
-	BOOST_CHECK( parseTo(R"([""])", x) );
+	BOOST_CHECK( parseString(R"([""])", x) );
 	BOOST_CHECK_EQUAL( *x, "");
 
-	BOOST_CHECK( parseTo(R"(["a"])", x) );
+	BOOST_CHECK( parseString(R"(["a"])", x) );
 	BOOST_CHECK_EQUAL( *x, "a");
 
-	BOOST_CHECK( parseTo(R"(["abc"])", x) );
+	BOOST_CHECK( parseString(R"(["abc"])", x) );
 	BOOST_CHECK_EQUAL( *x, "abc");
 
 	// More then 3 chars
-	BOOST_CHECK( !parseTo(R"(["abcd"])", x) );
+	BOOST_CHECK( !parseString(R"(["abcd"])", x) );
 }
 
 #include <jsoneasy/template/support/variant.hpp>
@@ -108,22 +101,22 @@ BOOST_AUTO_TEST_CASE ( variantRuntimeSelectTest ) {
 	typedef boost::variant<S3, S9, int, S> VariantType;
 
 	OneArray<VariantType> x;
-	BOOST_CHECK( parseTo(R"([""])", x) );
+	BOOST_CHECK( parseString(R"([""])", x) );
 	BOOST_CHECK_EQUAL( x.get<S3>(), "");
 
-	BOOST_CHECK( parseTo(R"(["abc"])", x) );
+	BOOST_CHECK( parseString(R"(["abc"])", x) );
 	BOOST_CHECK_EQUAL( x.get<S3>(), "abc");
 
-	BOOST_CHECK( parseTo(R"(["abcd"])", x) );
+	BOOST_CHECK( parseString(R"(["abcd"])", x) );
 	BOOST_CHECK_EQUAL( x.get<S9>(), "abcd");
 
-	BOOST_CHECK( parseTo(R"(["123456789"])", x) );
+	BOOST_CHECK( parseString(R"(["123456789"])", x) );
 	BOOST_CHECK_EQUAL( x.get<S9>(), "123456789");
 
-	BOOST_CHECK( parseTo(R"(["1234567890"])", x) );
+	BOOST_CHECK( parseString(R"(["1234567890"])", x) );
 	BOOST_CHECK_EQUAL( x.get<std::string>(), "1234567890");
 
-	BOOST_CHECK( parseTo( "[666]", x) );
+	BOOST_CHECK( parseString( "[666]", x) );
 	BOOST_CHECK_EQUAL( x.get<int>(), 666);
 }
 
@@ -136,19 +129,19 @@ BOOST_AUTO_TEST_CASE ( variantRuntimeSelectTest2 ) {
 	typedef boost::variant<S, S3, S9> VariantType;
 
 	OneArray<VariantType> x;
-	BOOST_CHECK( parseTo(R"([""])", x) );
+	BOOST_CHECK( parseString(R"([""])", x) );
 	BOOST_CHECK_EQUAL( x.get<std::string>(), "");
 
-	BOOST_CHECK( parseTo(R"(["abc"])", x) );
+	BOOST_CHECK( parseString(R"(["abc"])", x) );
 	BOOST_CHECK_EQUAL( x.get<std::string>(), "abc");
 
-	BOOST_CHECK( parseTo(R"(["abcd"])", x) );
+	BOOST_CHECK( parseString(R"(["abcd"])", x) );
 	BOOST_CHECK_EQUAL( x.get<std::string>(), "abcd");
 
-	BOOST_CHECK( parseTo(R"(["123456789"])", x) );
+	BOOST_CHECK( parseString(R"(["123456789"])", x) );
 	BOOST_CHECK_EQUAL( x.get<std::string>(), "123456789");
 
-	BOOST_CHECK( parseTo(R"(["1234567890"])", x) );
+	BOOST_CHECK( parseString(R"(["1234567890"])", x) );
 	BOOST_CHECK_EQUAL( x.get<std::string>(), "1234567890");
 }
 
@@ -185,9 +178,9 @@ struct Key<CustomKey> {
 // If variant values will be lested in reverse order - this will not work
 BOOST_AUTO_TEST_CASE ( customKeyTest ) {
 	std::map<CustomKey, int> x;
-	BOOST_CHECK( parseTo(R"({})", x) );
+	BOOST_CHECK( parseString(R"({})", x) );
 	BOOST_REQUIRE( x.empty() );
-	BOOST_CHECK( parseTo(R"({"":894, "abc":0, "01234567890": 11222 })", x) );
+	BOOST_CHECK( parseString(R"({"":894, "abc":0, "01234567890": 11222 })", x) );
 	BOOST_REQUIRE_EQUAL( x.size(), 3u);
 	BOOST_CHECK_EQUAL( x.at(0u), 894);
 	BOOST_CHECK_EQUAL( x.at(3u), 0);
