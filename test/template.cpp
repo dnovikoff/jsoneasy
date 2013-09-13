@@ -482,15 +482,6 @@ BOOST_AUTO_TEST_CASE( variantContainerTest ) {
 	}
 }
 
-// class type key test
-
 // utf symbols tests
-// int64
-// uint
-// char
-// test for negative parsing to uint
-// test for parsing value over numeric limits
-// test for 1000 trying to parse to char type
-// size_t
 // negative keys for size_t
 

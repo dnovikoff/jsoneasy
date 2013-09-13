@@ -195,4 +195,3 @@ BOOST_AUTO_TEST_CASE ( customKeyTest ) {
 }
 
 // check that movable, non-copyable types parsers compiles
-// add set of compilation tests
