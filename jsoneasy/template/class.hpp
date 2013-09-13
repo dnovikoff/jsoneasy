@@ -76,8 +76,30 @@ constexpr ClassInfo<FieldInfo<Type, FieldType> > createClass( const char(&str)[N
 	return ClassInfo<FieldInfo<Type, FieldType> >( FieldInfo<Type, FieldType>(String(str), f) );
 }
 
-#define JSONEASY_TEMPLATE_CLASS_INFO1( X ) static auto metadata() -> decltype( X ) { return X; }
-#define JSONEASY_TEMPLATE_CLASS_INFO( X ) JSONEASY_TEMPLATE_CLASS_INFO1( createClass X )
+/**
+ * Only meta function
+ */
+#define JE_META_ONLY( X ) static constexpr auto metadata() -> decltype( X ) { return X; }
+
+/**
+ * Declaration for meta function with define for ClassType (used by JE_FIELD macro)
+ */
+#define JE_META( NAME, X ) typedef NAME ClassType; JE_META_ONLY( createClass X )
+
+/**
+ * Helper function to omit multiple name repeat
+ */
+#define JE_FIELD( X ) ( #X, &ClassType::X )
+
+/**
+ * Specialization for class without namespace (if you have JsonEasy::Template around)
+ */
+#define JE_CLASS( NAME, X ) template<> class Class<NAME> { public: JE_META( NAME, X ) };
+
+/**
+ * Specialization for class within correct namespace
+ */
+#define JE_CLASS_NS( NAME, X ) namespace JsonEasy { namespace Template { JE_CLASS( NAME, X ) } }
 
 } // namespace Template
 } // namespace JsonEasy

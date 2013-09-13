@@ -12,9 +12,9 @@ struct Example {
 	std::string other;
 };
 
-struct t1 { JSONEASY_TEMPLATE_CLASS_INFO( ("first", &Example::first) ) };
-struct t2 { JSONEASY_TEMPLATE_CLASS_INFO( ("first", &Example::first)("second", &Example::second) ) };
-struct t3 { JSONEASY_TEMPLATE_CLASS_INFO( ("first", &Example::first)("second", &Example::second)("other", &Example::other) ) };
+struct t1 { JE_META( Example, JE_FIELD(first) ) };
+struct t2 { JE_META( Example, JE_FIELD(first)JE_FIELD(second) ) };
+struct t3 { JE_META( Example, JE_FIELD(first)JE_FIELD(second)JE_FIELD(other) ) };
 
 } // namespace Template
 } // namespace JsonEasy

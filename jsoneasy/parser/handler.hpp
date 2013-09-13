@@ -11,23 +11,22 @@ namespace Parser   {
  * Interface for your parser
  */
 class Handler {
-	// noncopy
-	Handler(const Handler&);
-	Handler& opeartor(const Handler&);
+	Handler(const Handler&) = delete;
+	Handler& opeartor(const Handler&) = delete;
+protected:
+	Handler() {}
 public:
 	virtual ~Handler() = 0;
 	typedef std::unique_ptr<Handler> Ptr;
-
-	Handler() {}
 
 	/**
 	 * Parsing different types
 	 * return false if it this is not the type expected
 	 */
 	// @{
-	virtual bool operator()(Integer) = 0;
-	virtual bool operator()(bool) = 0;
-	virtual bool operator()(double) = 0;
+	virtual bool operator()(Integer)      = 0;
+	virtual bool operator()(bool)         = 0;
+	virtual bool operator()(double)       = 0;
 	virtual bool operator()(std::string&) = 0;
 	// Called when null passes
 	virtual bool null() = 0;
@@ -53,11 +52,12 @@ public:
  * All operations fails by default
  */
 class BaseHandler: public Handler {
-public:
+protected:
 	virtual ~BaseHandler() = 0;
+public:
 	bool operator()(Integer)       override { return false; }
-	bool operator()(bool)         override { return false; }
-	bool operator()(double)       override { return false; }
+	bool operator()(bool)          override { return false; }
+	bool operator()(double)        override { return false; }
 	bool operator()(std::string&)  override { return false; }
 
 	bool null() override { return false; }
