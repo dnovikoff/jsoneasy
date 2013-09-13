@@ -17,7 +17,7 @@ struct VariantHelper;
 template<typename JsonType, typename VariantT, typename CurrentType>
 struct VariantHelperOne {
 	static bool apply(JsonType& j, VariantT& u) {
-		if( !TypeConvertable<JsonType, CurrentType>::value ) return false;
+		if( !IsConvertable<JsonType, CurrentType>::value ) return false;
 		CurrentType tmp;
 		if( !jsonToUser(j, tmp) ) return false;
 		u = std::move(tmp);

@@ -24,7 +24,12 @@ struct ConvertableFromOneOfSimpleHelper;
 
 template<typename UserType, typename JsonType>
 struct ConvertableFromOneOfSimpleHelper<UserType, JsonType> {
-	const static bool value = TypeConvertable<JsonType, UserType>::value ;
+	const static bool value = IsConvertable<JsonType, UserType>::value ;
+};
+
+template<typename T>
+struct ConvertableFromOneOfSimpleHelper<T, T> {
+	const static bool value = true ;
 };
 
 template<typename UserType, typename FirstJsonType, typename... OtherTypes >
@@ -36,8 +41,8 @@ struct ConvertableFromOneOfSimpleHelper {
 
 template<typename UserType>
 struct ConvertableFromOneOfSimple {
-	const static bool value =
-		ConvertableFromOneOfSimpleHelper<UserType, bool ,Parser::Integer , double, NullTag, std::string>::value
+	const static bool value = std::is_same<UserType, NullTag>::value ||
+		ConvertableFromOneOfSimpleHelper<UserType, bool ,Parser::Integer , double, /*NullTag,*/ std::string>::value
 	;
 };
 

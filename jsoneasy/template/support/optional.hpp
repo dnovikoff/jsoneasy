@@ -9,7 +9,7 @@ namespace JsonEasy {
 namespace Template {
 
 template<typename JsonType, typename T>
-struct Type<JsonType, boost::optional<T> > {
+struct Type<JsonType, boost::optional<T> >: public Type<JsonType, T> {
 	static bool jsonToUser(JsonType& j, boost::optional<T>& u) {
 		T tmp;
 		if( ! Template::jsonToUser(j, tmp) ) return false;
@@ -19,7 +19,7 @@ struct Type<JsonType, boost::optional<T> > {
 };
 
 template<typename T>
-struct Type<NullTag, boost::optional<T> >{
+struct Type<NullTag, boost::optional<T> > {
 	static bool jsonToUser(NullTag&, boost::optional<T>&) {
 		return true;
 	}

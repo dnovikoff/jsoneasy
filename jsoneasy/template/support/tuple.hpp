@@ -64,7 +64,7 @@ public:
 	// Due to AnyType we can use template parameter as argument
 	// but we also need to take care of correct conversion
 	template<typename T>
-	typename std::enable_if< TypeConvertable<T, ValueType>::value, bool>::type insert(T& x) {
+	typename std::enable_if< IsConvertable<T, ValueType>::value, bool>::type insert(T& x) {
 		InsertVisitor<T> ia(x);
 		if(!applyIndexHelper(data, index, ia)) return false;
 		++index;

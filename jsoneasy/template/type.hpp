@@ -27,32 +27,21 @@ struct LeftType: public NotConvertable {};
 template<typename JsonType, typename UserType>
 struct Type: public LeftType<JsonType, UserType> {};
 
-template<bool enable, typename JsonType, typename... UserTypes>
-struct TypeConvertableHelper {
-	const static bool value = false;
-};
+template<typename JsonType, typename UserType, typename... UserTypes>
+struct IsConvertable;
 
 template<typename JsonType, typename UserType>
-struct IsConvertable {
+struct IsConvertable<JsonType, UserType> {
 	const static bool value = !std::is_base_of<NotConvertable, Type<JsonType, UserType> >::value;
 };
 
 template<typename JsonType, typename UserType, typename... OtherTypes>
-struct TypeConvertableHelper<true, JsonType, UserType, OtherTypes...> {
-	const static bool value = IsConvertable<JsonType, UserType>::value
-		|| TypeConvertableHelper<sizeof...(OtherTypes)!=0, JsonType, OtherTypes...>::value;
+struct IsConvertable {
+	const static bool value = IsConvertable<JsonType, UserType>::value || IsConvertable<JsonType, OtherTypes...>::value;
 };
 
-
-template<typename JsonType, typename UserType>
-struct TypeConvertable {
-	const static bool value = TypeConvertableHelper<true, JsonType, UserType>::value;
-};
-
-template<typename JsonType, typename... UserTypes>
-struct TypeConvertable<JsonType, AnyType<UserTypes...> > {
-	const static bool value = TypeConvertableHelper<true, JsonType, UserTypes...>::value;
-};
+template<typename JsonType, typename... Types>
+struct IsConvertable< JsonType, AnyType<Types...> >: public IsConvertable< JsonType, Types... > {};
 
 /**
  * If user type matches json type, then allow by default

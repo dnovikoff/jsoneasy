@@ -10,7 +10,7 @@ namespace JsonEasy {
 namespace Template {
 namespace Details  {
 
-template<typename T, typename ValueType, bool enabled = TypeConvertable<T, ValueType>::value >
+template<typename T, typename ValueType, bool enabled = IsConvertable<T, ValueType>::value >
 class SelectInsert {
 public:
 	template<typename ContainerT>

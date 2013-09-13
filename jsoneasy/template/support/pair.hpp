@@ -30,7 +30,7 @@ public:
 	// but we also need to take care of correct conversion
 	// insert function could be called by handler only with T1 or T2 args
 	template<typename T>
-	typename std::enable_if< TypeConvertable<T, ValueType>::value, bool>::type insert(T& x) {
+	typename std::enable_if< IsConvertable<T, ValueType>::value, bool>::type insert(T& x) {
 		++index;
 		if(index == 1) {
 			return jsonToUser(x, data.first);
