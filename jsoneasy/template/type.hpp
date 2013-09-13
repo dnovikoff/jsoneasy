@@ -4,6 +4,8 @@
 #include <type_traits>
 #include <jsoneasy/template/container.hpp>
 
+#include <jsoneasy/template/any_type.hpp>
+
 namespace JsonEasy {
 namespace Template {
 
@@ -48,10 +50,6 @@ template<typename JsonType, typename UserType>
 struct TypeConvertable {
 	const static bool value = TypeConvertableHelper<true, JsonType, UserType>::value;
 };
-
-// Use as value type in case container could consist of different types (object, pair, tuple)
-template<typename... PossibleTypes>
-struct AnyType {};
 
 template<typename JsonType, typename... UserTypes>
 struct TypeConvertable<JsonType, AnyType<UserTypes...> > {

@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <jsoneasy/template/any_type.hpp>
+
 namespace JsonEasy {
 namespace Template {
 
@@ -29,13 +31,17 @@ public:
 	}
 };
 
-template<typename Type, typename FieldType>
+template<typename Type, typename FT>
 class FieldInfo {
-	typedef FieldInfo<Type, FieldType> self_t;
+	typedef FieldInfo<Type, FT> self_t;
 	const String name;
-	FieldType Type::* field;
+	FT Type::* field;
 public:
+	typedef FT FieldType;
+
 	constexpr FieldInfo( const String n, FieldType Type::* f ) : name(n), field(f) {}
+	constexpr const char * getName() const { return name.cString(); }
+	constexpr auto getField() -> decltype(field) const { return field; }
 };
 
 template<typename FirstField, typename... OtherFields>
@@ -46,11 +52,22 @@ class ClassInfo<FirstField> {
 	const FirstField field;
 	typedef ClassInfo<FirstField> self_t;
 public:
+	typedef AnyType<typename FirstField::FieldType> FieldTypes;
+
 	constexpr explicit ClassInfo(const FirstField& ff):field(ff) {}
 
 	template<typename Type, typename FieldType, size_t N>
 	constexpr ClassInfo<FirstField, FieldInfo<Type, FieldType> > operator()( const char(&str)[N], FieldType Type::* f ) {
 		return ClassInfo<FirstField, FieldInfo<Type, FieldType> >( FieldInfo<Type, FieldType>(String(str), f), *this );
+	}
+
+	/**
+	 * Returns false if stopped
+	 */
+	template<typename T>
+	bool visit(T& x) const {
+		if( !x( field ) ) return false;
+		return true;
 	}
 };
 
@@ -62,12 +79,26 @@ class ClassInfo {
 	OneParent one;
 	OtherParent other;
 	typedef ClassInfo<FirstField, OtherFields...> self_t;
+
+	typedef typename FirstField::FieldType FirstType;
+	typedef typename OtherParent::FieldTypes OtherTypes;
 public:
+	typedef typename OtherTypes::template Add<FirstType>::type FieldTypes;
 	constexpr ClassInfo(const FirstField& ff, const OtherParent& op):one(ff), other(op) {}
 
 	template<typename Type, typename FieldType, size_t N>
 	constexpr ClassInfo<FieldInfo<Type, FieldType>, FirstField, OtherFields...> operator()( const char(&str)[N], FieldType Type::* f ) {
 		return ClassInfo<FieldInfo<Type, FieldType>, FirstField, OtherFields... >( FieldInfo<Type, FieldType>(String(str), f), *this );
+	}
+
+	/**
+	 * Returns false if stopped
+	 */
+	template<typename T>
+	bool visit(T& x) const {
+		if( !one  .visit( x ) ) return false;
+		if( !other.visit( x ) ) return false;
+		return true;
 	}
 };
 
@@ -79,7 +110,7 @@ constexpr ClassInfo<FieldInfo<Type, FieldType> > createClass( const char(&str)[N
 /**
  * Only meta function
  */
-#define JE_META_ONLY( X ) static constexpr auto metadata() -> decltype( X ) { return X; }
+#define JE_META_ONLY( X ) static constexpr const decltype( X ) metadata() { return X; }
 
 /**
  * Declaration for meta function with define for ClassType (used by JE_FIELD macro)
@@ -100,6 +131,8 @@ constexpr ClassInfo<FieldInfo<Type, FieldType> > createClass( const char(&str)[N
  * Specialization for class within correct namespace
  */
 #define JE_CLASS_NS( NAME, X ) namespace JsonEasy { namespace Template { JE_CLASS( NAME, X ) } }
+
+// TODO: compiletime check for multiple filed usage
 
 } // namespace Template
 } // namespace JsonEasy

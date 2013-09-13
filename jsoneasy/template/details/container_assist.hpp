@@ -73,7 +73,7 @@ public:
 
 	template<typename CreatorType>
 	void create(CreatorType& x) {
-		container.template create<CreatorType>(x);
+		container.create(x);
 	}
 };
 
@@ -89,6 +89,7 @@ class ContainerAssist<true, ContainerT> {
 	KeyType tmpKey;
 public:
 	explicit ContainerAssist(ContainerT& c):container(c) {}
+
 	bool key(std::string& k) {
 		return Key<KeyType>::convert(k, tmpKey);
 	}
@@ -104,7 +105,7 @@ public:
 
 	template<typename CreatorType>
 	void create(CreatorType& x) {
-		container.template create<CreatorType>(x);
+		container.create(tmpKey, x);
 	}
 };
 
