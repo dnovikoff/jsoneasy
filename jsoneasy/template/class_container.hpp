@@ -39,7 +39,7 @@ public:
 			--index;
 			return true;
 		}
-		result = jsonToUser(jsonData, data.*field.getField() );
+		result = jsonToUser(jsonData, (data.*field.getField()) );
 		return false; // Index found - stop
 	}
 
@@ -79,8 +79,6 @@ class ClassContainer {
 		metadata().visit( v );
 		return tmp;
 	}
-public: // TODO: make back private (testing)
-
 	// key to its index
 	static const std::map<std::string, size_t> names;
 	size_t fieldCounter;

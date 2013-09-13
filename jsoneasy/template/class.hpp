@@ -2,6 +2,7 @@
 #define JSONEASY_TEMPLATE_CLASS_HPP_
 
 #include <string>
+#include <type_traits>
 
 #include <jsoneasy/template/any_type.hpp>
 
@@ -12,6 +13,11 @@ struct NotClass {};
 
 template<typename T>
 class Class: public NotClass {};
+
+template<typename T>
+struct IsClass {
+	const static bool value = !std::is_base_of<NotClass, Class<T> >::value;
+};
 
 class String {
 	const char * const begin_;

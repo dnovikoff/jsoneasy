@@ -3,6 +3,7 @@
 
 #include <jsoneasy/parser/handler.hpp>
 #include <jsoneasy/template/container.hpp>
+#include <jsoneasy/template/type_help.hpp>
 
 namespace JsonEasy {
 namespace Template {
@@ -55,7 +56,8 @@ public:
 template<JsonContainerType JsonType, typename HandlerT>
 static Parser::Handler::Ptr createSubHandler(HandlerT& h) {
 	typedef typename HandlerT::ContainerType::ValueType SubValueType;
-	typedef SubHandler<JsonType, SubValueType, typename HandlerT::AssistType> SubHandlerT;
+	typedef typename FixType<SubValueType>::type FixSubValueType;
+	typedef SubHandler<JsonType, FixSubValueType, typename HandlerT::AssistType> SubHandlerT;
 	return SubHandlerT::create(h.assist);
 }
 

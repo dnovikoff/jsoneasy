@@ -5,6 +5,7 @@
 #include <boost/mpl/bool.hpp>
 #include <jsoneasy/template/container.hpp>
 #include <jsoneasy/template/type.hpp>
+#include <jsoneasy/template/type_help.hpp>
 
 /**
  * Contains assert helpers for detecting if some type could be (potentialy) parsed from json
@@ -44,7 +45,8 @@ template<typename UserType> struct Convertable;
 
 template<JsonContainerType JType, typename UserType>
 struct ConveratableToContainer {
-	typedef Container<JType, UserType> ContainerT;
+	typedef typename FixType<UserType>::type FixedUserType;
+	typedef Container<JType, FixedUserType> ContainerT;
 	typedef typename ContainerT::ValueType ValueType;
 	const static bool value =
 		std::conditional<IsNotContainerTag<ValueType>::value, boost::mpl::bool_<false>, Convertable<ValueType> >::type::value;

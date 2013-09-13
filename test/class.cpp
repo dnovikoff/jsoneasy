@@ -21,10 +21,49 @@ struct Example {
 
 JE_CLASS_NS( Example , JE_FIELD(first)JE_FIELD(second)JE_FIELD(other) )
 
-BOOST_AUTO_TEST_CASE ( simple ) {
-	auto meta = JsonEasy::Template::ClassContainer< Example >::names;
-	for( auto p : meta ) {
-		std::cout << p.first << " = " << p.second << std::endl;
-	}
-	BOOST_CHECK( false );
+BOOST_AUTO_TEST_CASE ( simpleTest ) {
+	Example e;
+	BOOST_CHECK( !parseString("{}", e) );
+
+	BOOST_REQUIRE( parseString( R"({"first":345, "second" : 999, "other": "Dmitri Novikov"})", e) );
+	BOOST_CHECK_EQUAL( e.first, 345 );
+	BOOST_CHECK_EQUAL( e.second, 999 );
+	BOOST_CHECK_EQUAL( e.other, "Dmitri Novikov" );
+
+	// one more field
+	BOOST_REQUIRE( !parseString( R"({"first":345, "second" : 999, "other": "Dmitri Novikov", "onmorefield": 0})", e) );
+
+	// wrong type
+	BOOST_REQUIRE( !parseString( R"({"first": "d", "second" : 999, "other": "Dmitri Novikov"})", e) );
+
+	// one field less
+	BOOST_REQUIRE( !parseString( R"({"first":345, "second" : 999})", e) );
 }
+
+BOOST_AUTO_TEST_CASE ( complexTest ) {
+	OneArray<Example> e;
+	BOOST_CHECK( !parseString("[{}]", e) );
+
+	BOOST_REQUIRE( parseString( R"([{"first":345, "second" : 999, "other": "Dmitri Novikov"}])", e) );
+	BOOST_CHECK_EQUAL( e->first, 345 );
+	BOOST_CHECK_EQUAL( e->second, 999 );
+	BOOST_CHECK_EQUAL( e->other, "Dmitri Novikov" );
+}
+
+//// Subtype
+//struct Example1 {
+//	std::string name;
+//	Example data;
+//};
+//
+//JE_CLASS_NS( Example1 , JE_FIELD(name)JE_FIELD(data) )
+//
+//BOOST_AUTO_TEST_CASE ( subClassTest ) {
+//	Example1 e;
+//	BOOST_REQUIRE( parseString( R"({"name":"MyObject", "data":{"first":345, "second" : 999, "other": "Dmitri Novikov"}})", e) );
+//	BOOST_CHECK_EQUAL( e.name, "check" );
+//	BOOST_CHECK_EQUAL( e.data.first, 345 );
+//	BOOST_CHECK_EQUAL( e.data.second, 999 );
+//	BOOST_CHECK_EQUAL( e.data.other, "Dmitri Novikov" );
+//}
+
