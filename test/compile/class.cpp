@@ -3,14 +3,14 @@
 
 #include <jsoneasy/template/class.hpp>
 
-namespace JsonEasy {
-namespace Template {
-
 struct Example {
 	int first;
 	int second;
 	std::string other;
 };
+
+namespace JsonEasy {
+namespace Template {
 
 struct t1 { JE_META( Example, JE_FIELD(first) ) };
 struct t2 { JE_META( Example, JE_FIELD(first)JE_FIELD(second) ) };

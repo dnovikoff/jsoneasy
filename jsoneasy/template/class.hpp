@@ -63,8 +63,8 @@ public:
 	constexpr explicit ClassInfo(const FirstField& ff):field(ff) {}
 
 	template<typename Type, typename FieldType, size_t N>
-	constexpr ClassInfo<FirstField, FieldInfo<Type, FieldType> > operator()( const char(&str)[N], FieldType Type::* f ) {
-		return ClassInfo<FirstField, FieldInfo<Type, FieldType> >( FieldInfo<Type, FieldType>(String(str), f), *this );
+	constexpr  ClassInfo< FieldInfo<Type, FieldType>, FirstField > operator()( const char(&str)[N], FieldType Type::* f ) {
+		return ClassInfo< FieldInfo<Type, FieldType>, FirstField >( FieldInfo<Type, FieldType>(String(str), f), *this );
 	}
 
 	/**
@@ -79,22 +79,21 @@ public:
 
 template<typename FirstField, typename... OtherFields>
 class ClassInfo {
-	typedef ClassInfo<FirstField> OneParent;
-	typedef ClassInfo<OtherFields...> OtherParent;
+	typedef ClassInfo<FirstField>     ThisField;
+	typedef ClassInfo<OtherFields...> RestClassInfo;
 
-	OneParent one;
-	OtherParent other;
-	typedef ClassInfo<FirstField, OtherFields...> self_t;
+	ThisField     thisField;
+	RestClassInfo restClassInfo;
 
-	typedef typename FirstField::FieldType FirstType;
-	typedef typename OtherParent::FieldTypes OtherTypes;
+	typedef typename FirstField   ::FieldType   FirstType;
+	typedef typename RestClassInfo::FieldTypes  OtherTypes;
 public:
 	typedef typename OtherTypes::template Add<FirstType>::type FieldTypes;
-	constexpr ClassInfo(const FirstField& ff, const OtherParent& op):one(ff), other(op) {}
+	constexpr ClassInfo(const FirstField& tf, const RestClassInfo& r):thisField(tf), restClassInfo(r) {}
 
 	template<typename Type, typename FieldType, size_t N>
-	constexpr ClassInfo<FieldInfo<Type, FieldType>, FirstField, OtherFields...> operator()( const char(&str)[N], FieldType Type::* f ) {
-		return ClassInfo<FieldInfo<Type, FieldType>, FirstField, OtherFields... >( FieldInfo<Type, FieldType>(String(str), f), *this );
+	constexpr  ClassInfo<FieldInfo<Type, FieldType>, FirstField, OtherFields...> operator()( const char(&str)[N], FieldType Type::* f ) {
+		return ClassInfo<FieldInfo<Type, FieldType>, FirstField, OtherFields...>( FieldInfo<Type, FieldType>(String(str), f), *this );
 	}
 
 	/**
@@ -102,8 +101,8 @@ public:
 	 */
 	template<typename T>
 	bool visit(T& x) const {
-		if( !one  .visit( x ) ) return false;
-		if( !other.visit( x ) ) return false;
+		if( !thisField    .visit( x ) ) return false;
+		if( !restClassInfo.visit( x ) ) return false;
 		return true;
 	}
 };
