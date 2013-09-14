@@ -3,6 +3,7 @@
 
 #include <jsoneasy/template/create.hpp>
 #include <jsoneasy/template/support/list.hpp>
+#include <jsoneasy/template/class_container.hpp>
 
 struct UnknownType {};
 

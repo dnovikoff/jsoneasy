@@ -7,7 +7,6 @@
 
 #include <jsoneasy/parser/string_parser.hpp>
 #include <jsoneasy/template/create.hpp>
-#include <jsoneasy/template/class.hpp>
 #include <jsoneasy/template/class_container.hpp>
 
 #include "one_array.hpp"
@@ -61,7 +60,7 @@ JE_CLASS_NS( Example1 , JE_FIELD(name)JE_FIELD(data) )
 BOOST_AUTO_TEST_CASE ( subClassTest ) {
 	Example1 e;
 	BOOST_REQUIRE( parseString( R"({"name":"MyObject", "data":{"first":345, "second" : 999, "other": "Dmitri Novikov"}})", e) );
-	BOOST_CHECK_EQUAL( e.name, "check" );
+	BOOST_CHECK_EQUAL( e.name, "MyObject" );
 	BOOST_CHECK_EQUAL( e.data.first, 345 );
 	BOOST_CHECK_EQUAL( e.data.second, 999 );
 	BOOST_CHECK_EQUAL( e.data.other, "Dmitri Novikov" );

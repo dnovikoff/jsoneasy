@@ -3,7 +3,6 @@
 
 #include <jsoneasy/template/type.hpp>
 #include <jsoneasy/template/container.hpp>
-#include <jsoneasy/template/class_container.hpp>
 
 namespace JsonEasy {
 namespace Template {
@@ -34,13 +33,6 @@ struct GetContainerType <RequestedType, AnyType<PossibleTypes...> > {
 	// Pass to make it to take decision
 	typedef typename FirstContainerType<RequestedType, PossibleTypes...>::type::ValueType ValueType;
 	static const JsonContainerType value = IsNotContainerTag<ValueType>::value?NotContainer:RequestedType;
-};
-
-/** Choose between class and not class*/
-
-template<typename T>
-struct FixType {
-	typedef typename std::conditional< IsClass<T>::value, Class<T>, T >::type type;
 };
 
 } // namespace Template

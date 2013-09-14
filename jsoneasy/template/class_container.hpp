@@ -4,8 +4,8 @@
 #include <map>
 #include <string>
 
-#include <jsoneasy/template/container.hpp>
 #include <jsoneasy/template/class.hpp>
+#include <jsoneasy/template/container.hpp>
 
 namespace JsonEasy {
 namespace Template {
@@ -48,7 +48,7 @@ public:
 
 template<typename DataType, typename CreatorType>
 struct CreateFieldVisitor {
-	CreatorType creator;
+	CreatorType& creator;
 	size_t index;
 	bool result;
 public:
@@ -102,11 +102,11 @@ public:
 	}
 
 	template<typename C>
-	bool create(const KeyType& key, C&) {
+	bool create(const KeyType& key, C& c) {
 		auto i = names.find(key);
 		if( i == names.end() ) return false;
 		const size_t index = i->second;
-		CreateFieldVisitor<ClassType, C> v( data, index );
+		CreateFieldVisitor<ClassType, C> v( c, index );
 		metadata().visit( v );
 		return v.getResult();
 	}
@@ -114,9 +114,6 @@ public:
 	// Number of fields should match exactly
 	bool validate() const { return fieldCounter == names.size(); }
 };
-
-template<typename ClassType>
-class Container<JsonObject, Class<ClassType> > : public ClassContainer<ClassType> {};
 
 template<typename ClassType>
 const std::map<std::string, size_t> ClassContainer<ClassType>::names = fillNames();

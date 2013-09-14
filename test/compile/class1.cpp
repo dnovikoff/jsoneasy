@@ -2,6 +2,7 @@
 #define BOOST_TEST_MAIN
 
 #include <jsoneasy/template/create.hpp>
+#include <jsoneasy/template/class_container.hpp>
 #include <jsoneasy/template/support/list.hpp>
 
 struct Example {

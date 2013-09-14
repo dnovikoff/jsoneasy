@@ -1,7 +1,7 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
-#include <jsoneasy/template/class.hpp>
+#include <jsoneasy/template/class_container.hpp>
 
 struct Example {
 	int first;

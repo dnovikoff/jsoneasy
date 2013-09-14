@@ -130,7 +130,9 @@ constexpr ClassInfo<FieldInfo<Type, FieldType> > createClass( const char(&str)[N
 /**
  * Specialization for class without namespace (if you have JsonEasy::Template around)
  */
-#define JE_CLASS( NAME, X ) template<> class Class<NAME> { public: JE_META( NAME, X ) };
+#define JE_CLASS( NAME, X ) \
+	template<> class Class<NAME> { public: JE_META( NAME, X ) }; \
+	template<> class Container<JsonObject, NAME> : public ClassContainer<NAME> {};
 
 /**
  * Specialization for class within correct namespace

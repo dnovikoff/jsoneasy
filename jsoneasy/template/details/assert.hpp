@@ -50,8 +50,7 @@ template<typename UserType> struct Convertable;
 
 template<JsonContainerType JType, typename UserType>
 struct ConveratableToContainer {
-	typedef typename FixType<UserType>::type FixedUserType;
-	typedef Container<JType, FixedUserType> ContainerT;
+	typedef Container<JType, UserType> ContainerT;
 	typedef typename ContainerT::ValueType ValueType;
 	const static bool value =
 		std::conditional<IsNotContainerTag<ValueType>::value, boost::mpl::bool_<false>, Convertable<ValueType> >::type::value;

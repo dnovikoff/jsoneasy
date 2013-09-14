@@ -56,8 +56,7 @@ public:
 template<JsonContainerType JsonType, typename HandlerT>
 static Parser::Handler::Ptr createSubHandler(HandlerT& h) {
 	typedef typename HandlerT::ContainerType::ValueType SubValueType;
-	typedef typename FixType<SubValueType>::type FixSubValueType;
-	typedef SubHandler<JsonType, FixSubValueType, typename HandlerT::AssistType> SubHandlerT;
+	typedef SubHandler<JsonType, SubValueType, typename HandlerT::AssistType> SubHandlerT;
 	return SubHandlerT::create(h.assist);
 }
 
