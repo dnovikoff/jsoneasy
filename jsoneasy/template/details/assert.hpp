@@ -77,11 +77,6 @@ struct Convertable< AnyType<FirstType, OtherTypes...> > {
 	const static bool value = Convertable<FirstType>::value && ( Convertable< AnyType<OtherTypes...> >::value );
 };
 
-template<typename T>
-struct ConvertableFromJsonContainerAssert {
-	typedef typename std::enable_if<Convertable<T>::convertableToContainer, OkType>::type type;
-};
-
 } // namespace Details
 } // namespace Template
 } // namespace JsonEasy

@@ -16,8 +16,8 @@ namespace Template {
  */
 template<typename T>
 Parser::Handler::Ptr createHandler(T& data) {
-	// This is checking for parsing possibility ( enought specializations )
-	typedef typename Details::ConvertableFromJsonContainerAssert< T >::type StaticAssert;
+	static_assert(Details::Convertable<T>::convertableToContainer, "Parsed type should be convertable to json container");
+
 	Parser::Handler::Ptr p(new Details::StartHandler<T>(data));
 	return p;
 }
